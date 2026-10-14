@@ -1215,11 +1215,11 @@ async function gpNearby(at,radius){ // the food places within ~100 m, closest fi
 
 /* Photo → menu JSON through the Supabase Edge Function read-menu. The phone sends a shrunken JPEG (base64); the function holds the Anthropic key as a secret,
    stores nothing, and answers {text}. 12 s timeout; any failure becomes {code:"edge_failed"} so Teach falls back to typing. */
-async function readMenuRemote(prompt,image){
-  let res;try{res=await fetchT(SB_URL+"/functions/v1/read-menu",{method:"POST",headers:SB_HEADERS,body:JSON.stringify({image,prompt,device_id:DEVICE_ID})},12000);}catch(e){throw {code:"edge_failed"};}
+async function readMenuRemote(prompt,image,max){
+  let res;try{res=await fetchT(SB_URL+"/functions/v1/read-menu",{method:"POST",headers:SB_HEADERS,body:JSON.stringify({image,prompt,max:max||4000,device_id:DEVICE_ID})},60000);}catch(e){throw {code:"edge_failed"};}
   if(res.status===429)throw {code:"rate_limited"};if(!res.ok)throw {code:"edge_failed"};
   let j;try{j=await res.json();}catch(e){throw {code:"edge_failed"};}
-  if(!j||typeof j.text!=="string")throw {code:"edge_failed"};return j.text;
+  if(!j||typeof j.text!=="string")throw {code:"edge_failed"};return {text:j.text,stop:j.stop||""};
 }
 
 /* ---------- STATE ---------- */
@@ -1955,16 +1955,28 @@ function buildRealMap(container,opts){
 
 /* ---------- CLAUDE: inside claude.ai via sample, elsewhere via the API key ---------- */
 let sampleFn=null;
+/* Claude's JSON, read forgivingly: no ```json fences or chatter around it; if the answer was cut off (max_tokens), keep everything up to the
+   last complete value and close the brackets, so the items that did arrive are saved. On failure: {code:"invalid_json",detail:"(stop: …) first 80 chars"}. */
+function looseJSON(text,stop){
+  let s=String(text||"").replace(/```(?:json)?/gi,"");const a=s.indexOf("{");if(a<0)throw {code:"invalid_json",detail:jsonDetail(text,stop)};s=s.slice(a);
+  const b=s.lastIndexOf("}");if(b>=0){try{return JSON.parse(s.slice(0,b+1));}catch(e){}}
+  const stack=[],cuts=[];let inStr=false,esc=false;
+  for(let i=0;i<s.length;i++){const ch=s[i];
+    if(inStr){if(esc)esc=false;else if(ch==="\\")esc=true;else if(ch==='"')inStr=false;continue;}
+    if(ch==='"')inStr=true;else if(ch==="{"||ch==="[")stack.push(ch==="{"?"}":"]");else if(ch==="}"||ch==="]"){stack.pop();cuts.push([i+1,stack.slice().reverse().join("")]);}}
+  for(let k=cuts.length-1;k>=0&&k>=cuts.length-400;k--){const [at,close]=cuts[k];try{const j=JSON.parse(s.slice(0,at).replace(/,\s*$/,"")+close);j.__cut=true;return j;}catch(e){}}
+  throw {code:"invalid_json",detail:jsonDetail(text,stop)};}
+function jsonDetail(text,stop){return (stop?"(stop: "+stop+") ":"")+String(text||"").replace(/\s+/g," ").trim().slice(0,80);}
 async function askClaude(prompt,o){o=o||{};
   if(sampleFn&&!o.image){if(o.json)return sampleFn.json(prompt,{modelTier:"quick"});const r=await sampleFn(prompt,{modelTier:"quick",onText:o.onText});return r.text;}
   const key=getKey();
-  if(!key&&o.image){const text=await readMenuRemote(prompt,o.image);if(o.json){const m=text.match(/\{[\s\S]*\}/);try{return JSON.parse(m?m[0]:text);}catch(e){throw {code:"invalid_json"};}}return text;}
+  if(!key&&o.image){const r=await readMenuRemote(prompt,o.image,o.max);return o.json?looseJSON(r.text,r.stop):r.text;}
   if(!key)throw {code:"no_key"};
   const content=o.image?[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:o.image}},{type:"text",text:prompt}]:prompt;
   const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-haiku-5-5",max_tokens:o.max||400,messages:[{role:"user",content}]})});
   if(!res.ok)throw {code:res.status===401?"not_granted":res.status===429?"rate_limited":"upstream_error"};
   const j=await res.json();const text=(j.content||[]).map(c=>c.text||"").join("");
-  if(o.json){const m=text.match(/\{[\s\S]*\}/);try{return JSON.parse(m?m[0]:text);}catch(e){throw {code:"invalid_json"};}}return text;
+  if(o.json)return looseJSON(text,j.stop_reason||"");return text;
 }
 function claudeAvailable(){return !!sampleFn||!!getKey();}
 function claudeErr(e,fallback){return e&&e.code==="no_key"?(IN_CLAUDE?"Needs Claude: add an API key under Cards & apps.":"Snapping needs Claude. Type it instead →"):e&&e.code==="no_vision"?"Photos need the installed app with an API key. Type it instead →":e&&e.code==="not_granted"?"Claude wasn’t allowed here.":e&&e.code==="rate_limited"?"Too many asks. Try again in a minute.":e&&e.code==="invalid_json"?"Claude’s answer wasn’t readable. Try again.":fallback;}
@@ -2180,14 +2192,22 @@ function wireMenu(d,place){
       teachBump();persist();render();
       const everyone=await saveShared({kind:"menu",place_name:finalName,address,lat,lon,items:offers.map(x=>({item:x.item,price:x.price,cat:x.cat,diet:x.tags})),added_by:firstName()||"a student",place_id:T.shop.placeId||null,coord_source:coordSource});
       T.sent=true;setStep(3);btn.hidden=true;saved.textContent=(everyone?"Everyone nearby sees it. ":"Saved on this phone"+(shared.lastErr?" ("+shared.lastErr+")":"")+". ")+keep.length+" item"+(keep.length>1?"s":"")+" at "+finalName+" · not verified yet.";teachCelebrate(d,pts,"Cheers. That’s on the map now.");if(d.scrollTo)d.scrollTo({top:0,behavior:"smooth"});};};
-  const cleanItems=j=>{const all=((j&&j.items)||[]).filter(x=>x&&typeof x.price==="number"&&x.item);const items=all.filter(x=>x.price>=0.2&&x.price<=15).slice(0,25);return {items,odd:all.length-items.length};};
+  const cleanItems=j=>{const all=((j&&j.items)||[]).filter(x=>x&&typeof x.price==="number"&&x.item);const items=all.filter(x=>x.price>=0.2&&x.price<=15).slice(0,40);return {items,odd:all.length-items.length};};
+  // the compact photo answer {"m","p","i":[[name,price,cat]]} → {isMenu,place,items:[{item,price,cat,tags}]}; the old long form still works
+  const CATS1={h:"hot",s:"snack",c:"coffee",w:"sweet",d:"deal"};
+  const photoItems=j=>{if(!j)return null;const rows=Array.isArray(j.i)?j.i:Array.isArray(j.items)?j.items:[];
+    const items=rows.map(r=>Array.isArray(r)?{item:String(r[0]||"").trim(),price:Number(r[1]),cat:CATS1[r[2]]||r[2]}:r).filter(x=>x&&x.item&&isFinite(x.price))
+      .map(x=>{const cat=["hot","snack","coffee","sweet","deal"].includes(x.cat)?x.cat:(Object.keys(CAT_WORDS).find(k=>CAT_WORDS[k].test(x.item))||"snack");return {item:x.item.slice(0,60),price:Math.round(x.price*100)/100,cat,tags:Array.isArray(x.tags)?x.tags:Object.keys(TAG_WORDS).filter(k=>TAG_WORDS[k].test(x.item))};});
+    return {isMenu:!(j.m===0||j.isMenu===false),place:j.p!=null?j.p:(j.place||""),items,cut:!!j.__cut};};
   const onFile=async(input)=>{const f=input.files&&input.files[0];if(!f||!T.shop)return;
     if(teachCount()>=TEACH_MAX){note.textContent="Five a day is the limit. Even for rats. Back tomorrow.";input.value="";return;}
     note.textContent="Reading the board. Squinting…";teachFace(d,"f_sniff","Reading the board. Squinting…");out.innerHTML="";which.innerHTML="";check.textContent="";T.keep=null;T.via="photo";q("#ts3").textContent="+10 crumbs";
     try{const b64=await shrinkImage(f,1600);
-      const prompt='This is a photo taken in London. First decide if it shows a menu, a menu board, a price list or shelf price labels. Reply with JSON only: {"isMenu":true or false,"place":"shop or café name if it appears anywhere in the photo, else \\"\\"",'+ITEM_SHAPE+'}. If it is not a menu or price list, reply {"isMenu":false,"place":"","items":[]}. Read prices carefully; if a price is unreadable, leave the item out. "hot" = hot food, "snack" = cold food, "coffee" = any drink, "sweet" = cakes and desserts.';
-      const j=await askClaude(prompt,{json:true,image:b64,max:1400});
-      if(!j||j.isMenu===false||!Array.isArray(j.items)||!j.items.length){check.textContent="That’s not a menu. Nice try.";teachFace(d,"f_sad","That’s not a menu. Nice try.");note.textContent="";return;}
+      const prompt='This is a photo taken in London. Decide if it shows a menu, a menu board, a price list or shelf price labels. Reply with compact JSON only, no markdown, no comments: {"m":1,"p":"shop or café name if it appears in the photo, else empty","i":[["item name",price,"c"],…]}. '+
+        'Rules: at most 40 items, the cheapest first if there are more. Each size is its own item: ["Latte (Regular)",3.85,"c"],["Latte (Large)",4.25,"c"]. Price is a number in pounds (65p = 0.65). Ignore calories. Include add-ons that cost £0.20 or more (e.g. ["Add flavour",0.65,"c"]); skip ones under £0.20. '+
+        'Leave out any item whose price you cannot read. Category c: "h" hot food, "s" cold food or snack, "c" any drink, "w" cakes and sweets, "d" meal deal. If it is not a menu or price list reply {"m":0,"p":"","i":[]}.';
+      const j=photoItems(await askClaude(prompt,{json:true,image:b64,max:4000}));
+      if(!j||j.isMenu===false||!j.items.length){check.textContent="That’s not a menu. Nice try.";teachFace(d,"f_sad","That’s not a menu. Nice try.");note.textContent="";return;}
       const {items,odd}=cleanItems(j);
       if(!items.length){check.textContent=odd?"Those prices don’t look right (under £0.20 or over £15). Not saved.":"Claude couldn’t read prices in that photo. Try closer, straighter, more light.";note.textContent="";return;}
       const board=String(j.place||"").slice(0,40);
@@ -2195,7 +2215,8 @@ function wireMenu(d,place){
       else{check.textContent="The board says "+board+", you picked "+T.shop.name+". Which is it?";teachFace(d,"f_oh","The board says "+board+", you picked "+T.shop.name+". Which is it?");note.textContent="";
         which.innerHTML='<button type="button" class="chip" id="wBoard">'+esc(board)+'</button><button type="button" class="chip" id="wPick">'+esc(T.shop.name)+'</button>';
         which.querySelector("#wBoard").onclick=()=>{T.shop={...T.shop,name:board,src:"board"};fixLine();showItems(items,odd,board);};which.querySelector("#wPick").onclick=()=>showItems(items,odd,board);}
-    }catch(e){if(e&&(e.code==="rate_limited"||e.code==="not_granted"||e.code==="invalid_json")){check.textContent=claudeErr(e,"Claude didn’t answer. Try again.");note.textContent="";}else typeInstead("Couldn’t read that one. Type it instead →");}
+      if(j.cut)check.insertAdjacentHTML("beforeend",'<br><small class="meta">(stop: max_tokens · kept the '+items.length+' items that arrived)</small>');
+    }catch(e){if(e&&(e.code==="rate_limited"||e.code==="not_granted"||e.code==="invalid_json")){check.innerHTML=esc(claudeErr(e,"Claude didn’t answer. Try again."))+(e.detail?'<br><small class="meta">'+esc(e.detail)+'</small>':'');note.textContent="";}else typeInstead("Couldn’t read that one. Type it instead →");}
     finally{input.value="";}};
   file.onchange=()=>onFile(file);if(file2)file2.onchange=()=>onFile(file2);
   q("#tTypeBtn").onclick=()=>{const box=q("#tTypeBox");box.hidden=!box.hidden;if(!box.hidden)q("#tTypeIn").focus();};
@@ -2236,7 +2257,7 @@ function addHours(hhmm,h){const m=hm(hhmm)+h*60;return String(Math.floor(m/60)%2
 const SOURCES='<p class="body">UCL outlet hours and addresses: the printed Food at UCL guide 2026/27 and the Food at UCL app.</p><p class="body">Chain prices: menus photographed in store (Pret, itsu, GAIL’s, Leon, Tortilla, Wasabi, atis, Costa) and UK price trackers, Oct 2026, takeaway. Sitting in can cost more.</p><p class="body">Meal deals: national press, Aug 2025. Shop addresses: store locators, Oct 2026.</p><p class="body">What students teach Fiver shows as “added by {name} · not verified yet” until someone checks it.</p><p class="body">Walking at 80 m/min; 6 minutes to eat on the go, 12 to sit down.</p><p class="body">Allergens change: always ask staff.</p>';
 document.getElementById("foot").innerHTML='<div class="installBox"></div>';
 if(DEMO.where){const v=VENUES.find(x=>x.id===DEMO.where);if(v){state.uni="ucl";state.where={lat:v.lat,lon:v.lon,label:v.name};state.setupDone=true;state.seenResults=true;state.step=S.results;}}
-window.__fiver={state,render,rank,selectedTime,unlock,S,openMenu,openTeach,todayDeals,cardUnlocks,UI,addCrumbs,rankName,nameMatch,teachCount,photonRows,shared,loadShared,sharedPlace,ON_SITE,DEVICE_ID,DEMO,MOMENTS,moment,pickMoment,ART,ARTW,UNIS,UNI_LIST,uniPlaces,allPlaces,persist,openSheet,msRender,cardsFor,footText,isOpen,metres,startAgain,areaName,openInstallSheet,rankName};
+window.__fiver={state,render,rank,selectedTime,unlock,S,openMenu,openTeach,todayDeals,cardUnlocks,UI,addCrumbs,rankName,nameMatch,teachCount,photonRows,shared,loadShared,sharedPlace,ON_SITE,DEVICE_ID,DEMO,MOMENTS,moment,pickMoment,ART,ARTW,UNIS,UNI_LIST,uniPlaces,allPlaces,persist,openSheet,msRender,cardsFor,footText,isOpen,metres,startAgain,areaName,openInstallSheet,rankName,looseJSON};
 render();
 (async()=>{try{if(window.claude&&claude.use){sampleFn=await claude.use("sample");}}catch(e){sampleFn=null;}if(state.step>=S.where)render();})();
 </script>
