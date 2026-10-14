@@ -1,6 +1,6 @@
 {
  "name": "Fed for a Fiver",
- "short_name": "Fiver",
+ "short_name": "Fed for a Fiver",
  "description": "Under a fiver, near you. Food near UCL priced with your student cards.",
  "start_url": "./",
  "scope": "./",
