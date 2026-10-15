@@ -1,6 +1,6 @@
 /* Fiver service worker. index.html is always fetched from the network (no HTTP cache) so a fresh upload shows on the next reload;
    the saved copy is used only when there is no connection. Icons and the manifest come from the cache. The cache name changes with every build. */
-const CACHE="fiver-v50";
+const CACHE="fiver-v52";
 const SHELL=["./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(SHELL.map(u=>c.add(new Request(u,{cache:"reload"})).catch(()=>null)))).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});

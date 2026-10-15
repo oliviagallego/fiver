@@ -990,7 +990,21 @@ function uniPlaces(){ // the other universities' outlets and every chain branch 
   return _uniPlaces=out;
 }
 function uniOk(p){return !p.uni||p.audience!=="uni_only"||p.uni===state.uni;}
-function allPlaces(){return PLACES.concat(state.added,shared.places,uniPlaces().filter(uniOk));}
+/* A menu taught for a place Fiver already knows (same place_id, or the same chain within 60 m) joins that place: its name and hours stay,
+   the new prices win where the item is the same, new items are added. Only menus for places Fiver doesn't know stand on their own. */
+function baseFor(t,base){if(t.when)return null;let best=null,bd=61;
+  for(const p of base){if(p.when||p.unpriced&&!p.chain&&!p.independent)continue;if(t.placeId&&p.placeId&&t.placeId===p.placeId)return p;
+    if(chainKey(p.name)!==chainKey(t.name))continue;const m=metres(p,t);if(m<bd){bd=m;best=p;}}
+  return best;}
+const itemKey=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+function joinTaught(p,taught){const offers=p.offers.slice();
+  for(const t of taught)for(const o of t.offers){const k=itemKey(o.item);const i=offers.findIndex(x=>itemKey(x.item)===k);const n=Object.assign({},o,{taught:true});if(i>=0)offers[i]=Object.assign({},offers[i],{price:n.price,status:"added",with:undefined,taught:true});else offers.push(n);}
+  return Object.assign({},p,{offers,unpriced:false,taughtBy:taught.length});}
+function allPlaces(){
+  const base=PLACES.concat(uniPlaces().filter(uniOk));const taught=state.added.concat(shared.places);
+  const joined=new Map(),alone=[];
+  for(const t of taught){const b=baseFor(t,base);if(b){(joined.get(b.id)||joined.set(b.id,[]).get(b.id)).push(t);}else alone.push(t);}
+  return base.map(p=>joined.has(p.id)?joinTaught(p,joined.get(p.id)):p).concat(alone);}
 /* "Something specific": words typed or tapped, matched against item names. Generic words are ignored. */
 /* Typos: every word is checked against the words on the menus; a near miss (edit distance ≤ 2) is corrected. */
 let VOCAB=null;
@@ -1159,10 +1173,10 @@ function sharedPlace(r){
   const base={id:"sb-"+r.id,name:String(r.place_name||"Somewhere").slice(0,48),lat:Number(r.lat),lon:Number(r.lon),addr:String(r.address||"").slice(0,80),status:"added",addedBy:String(r.added_by||"a student").slice(0,24),shared:true,age,placeId:r.place_id||"",coordSource:r.coord_source||""};
   if(r.kind==="event"){const s=r.starts_at?new Date(r.starts_at):null,e=r.ends_at?new Date(r.ends_at):null;if(!s||isNaN(s))return null;
     const hhmm=d=>String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");const date=s.getFullYear()+"-"+String(s.getMonth()+1).padStart(2,"0")+"-"+String(s.getDate()).padStart(2,"0");
-    return Object.assign(base,{when:{date,start:hhmm(s),end:e&&!isNaN(e)?hhmm(e):addHours(hhmm(s),2)},offers:[{cat:"free",item:items[0]&&items[0].item||"free food",price:0,status:"added",tags:[]}],why:"Added from an invite by "+base.addedBy+"."});}
+    return Object.assign(base,{when:{date,start:hhmm(s),end:e&&!isNaN(e)?hhmm(e):addHours(hhmm(s),2)},offers:[{cat:"free",item:items[0]&&items[0].item||"free food",price:0,status:"added",tags:[]}],why:""});}
   const offers=items.filter(x=>x&&x.item&&typeof x.price==="number"&&x.price>=0&&x.price<=15).map(x=>({cat:CATS.some(c=>c.id===x.cat)?x.cat:"snack",item:String(x.item).slice(0,60),price:Math.round(x.price*100)/100,status:"added",tags:Array.isArray(x.diet)?x.diet.filter(t=>typeof t==="string"):[]}));
   if(!offers.length||isNaN(base.lat)||isNaN(base.lon))return null;
-  return Object.assign(base,{hoursUnknown:true,offers,why:"Taught to Fiver by "+base.addedBy+(age>30?" · checked "+age+" days ago":"")+". Hours unknown. Not verified yet."});
+  return Object.assign(base,{hoursUnknown:true,offers,why:""});
 }
 /* Read everything 'live' when Results opens (3 s, then we stop waiting). Mine stay local, so they are skipped here. */
 async function loadShared(force){
@@ -1198,18 +1212,25 @@ async function gpAutocomplete(q,bias){ // → rows {place,name,sub,placeId,src:"
     rows.push({place,name:(p.structuredFormat&&p.structuredFormat.mainText&&p.structuredFormat.mainText.text)||(p.text&&p.text.text)||"",sub:(p.structuredFormat&&p.structuredFormat.secondaryText&&p.structuredFormat.secondaryText.text)||"",placeId:p.placeId,src:"google"});}
   return rows.sort((a,b)=>(b.place?1:0)-(a.place?1:0)).slice(0,8);
 }
+/* Google's regularOpeningHours.periods → Fiver's hours ({wk,sat,sun} + a key per weekday; null = closed that day). None → null. */
+function gpHours(h){if(!h||!Array.isArray(h.periods)||!h.periods.length)return null;
+  const K=["sun","mon","tue","wed","thu","fri","sat"],hh=x=>String(x.hour||0).padStart(2,"0")+":"+String(x.minute||0).padStart(2,"0");
+  if(h.periods.length===1&&h.periods[0].open&&!h.periods[0].close)return {wk:["00:00","23:59"],sat:["00:00","23:59"],sun:["00:00","23:59"]};
+  const d={};for(const p of h.periods){if(!p.open)continue;const k=K[p.open.day];if(d[k])continue;let c=p.close?hh(p.close):"23:59";if(c==="00:00")c="23:59";d[k]=[hh(p.open),c];}
+  const out={wk:d.mon||d.tue||d.wed||d.thu||d.fri||null,sat:d.sat||null,sun:d.sun||null};if(!out.wk)return null;
+  for(const k of ["mon","tue","wed","thu","fri"])out[k]=d[k]||null;return out;}
 async function gpDetails(placeId){ // → {lat,lon,addr}; ends the autocomplete session
   const tok=gpToken();gpSession=null;
-  const res=await fetchT("https://places.googleapis.com/v1/places/"+encodeURIComponent(placeId)+"?sessionToken="+encodeURIComponent(tok)+"&languageCode=en&regionCode=gb",{headers:{"X-Goog-Api-Key":GP_KEY,"X-Goog-FieldMask":"location,shortFormattedAddress"}},5000);
+  const res=await fetchT("https://places.googleapis.com/v1/places/"+encodeURIComponent(placeId)+"?sessionToken="+encodeURIComponent(tok)+"&languageCode=en&regionCode=gb",{headers:{"X-Goog-Api-Key":GP_KEY,"X-Goog-FieldMask":"location,shortFormattedAddress,regularOpeningHours"}},5000);
   if(!res.ok)throw {code:"google "+res.status};const j=await res.json();
-  if(!j.location)throw {code:"google nolocation"};return {lat:j.location.latitude,lon:j.location.longitude,addr:j.shortFormattedAddress||""};
+  if(!j.location)throw {code:"google nolocation"};return {lat:j.location.latitude,lon:j.location.longitude,addr:j.shortFormattedAddress||"",hours:gpHours(j.regularOpeningHours)};
 }
 async function gpNearby(at,radius){ // the food places within ~100 m, closest first
   if(!ON_SITE)return [];
   try{const body={includedTypes:["cafe","coffee_shop","restaurant","bakery","fast_food_restaurant","sandwich_shop","meal_takeaway","supermarket","convenience_store","grocery_store","dessert_shop","tea_house","pub"],maxResultCount:12,rankPreference:"DISTANCE",languageCode:"en",regionCode:"gb",locationRestriction:{circle:{center:{latitude:at.lat,longitude:at.lon},radius}}};
-    const res=await fetchT("https://places.googleapis.com/v1/places:searchNearby",{method:"POST",headers:{"Content-Type":"application/json","X-Goog-Api-Key":GP_KEY,"X-Goog-FieldMask":"places.id,places.displayName,places.location,places.shortFormattedAddress"},body:JSON.stringify(body)},5000);
+    const res=await fetchT("https://places.googleapis.com/v1/places:searchNearby",{method:"POST",headers:{"Content-Type":"application/json","X-Goog-Api-Key":GP_KEY,"X-Goog-FieldMask":"places.id,places.displayName,places.location,places.shortFormattedAddress,places.regularOpeningHours"},body:JSON.stringify(body)},5000);
     if(!res.ok)return [];const j=await res.json();
-    return (j.places||[]).filter(p=>p.location&&p.displayName).map(p=>({place:true,name:p.displayName.text||"",sub:p.shortFormattedAddress||"",lat:p.location.latitude,lon:p.location.longitude,placeId:p.id,src:"google"}));}
+    return (j.places||[]).filter(p=>p.location&&p.displayName).map(p=>({place:true,name:p.displayName.text||"",sub:p.shortFormattedAddress||"",lat:p.location.latitude,lon:p.location.longitude,placeId:p.id,src:"google",hours:gpHours(p.regularOpeningHours)}));}
   catch(e){return [];}
 }
 
@@ -1599,7 +1620,7 @@ function pickCard(x,t,o){o=o||{};
     '<span class="ms" data-ms="'+esc(x.p.name)+'" style="--ms:16px"></span>'+
     '<p class="lead">'+esc(x.of.item)+'</p>'+
     '<p class="meta"><b>'+esc(statusLine(x,t))+'</b></p>'+
-    '<p class="meta">'+breakdown(x)+(x.of.in?' · '+money(x.of.in)+' if you sit in':'')+(x.p.addedBy?' · added by '+esc(x.p.addedBy)+' · not verified yet':'')+(x.p.age>30?' · checked '+x.p.age+' days ago':'')+'</p>'+
+    '<p class="meta">'+breakdown(x)+(x.of.in?' · '+money(x.of.in)+' if you sit in':'')+'</p>'+
     (dietLine(x.of)?'<p class="diet">'+esc(dietLine(x.of))+'</p>':'')+
     (UNCHECKED.has(x.of.status)?'<button type="button" class="linkbtn teach" data-teach="'+esc(x.p.id)+'">Price not checked. Snap the menu →</button>':'')+
     (o.compact?'<div class="actions"><a class="arrbtn big" href="'+gmaps(x.p)+'" target="_blank" rel="noopener"><span class="ms" data-ms="Walk there" style="--ms:11px"></span>'+AR+'</a><button type="button" class="chip" data-open="'+esc(x.p.id)+'">Details</button></div>':
@@ -1734,7 +1755,7 @@ function vResults(){
   const ft=d.querySelector("#farTeach");if(ft)ft.onclick=()=>openTeach();const qt=d.querySelector("#qTeach");if(qt)qt.onclick=()=>openTeach();const fm=d.querySelector("#farMain");if(fm)fm.onclick=()=>{const m=state.uni!=="ucl"&&uniMain();const v=m||VENUES.find(x=>x.id==="quad");state.where={lat:v.lat,lon:v.lon,label:v.name};persist();render();};
   wireFilters(d);d.querySelectorAll(".teach").forEach(b=>b.onclick=()=>openTeach(b.dataset.teach?allPlaces().find(p=>p.id===b.dataset.teach):null));if(UI.catScroll)setTimeout(()=>{const c=view.querySelector("#catChips");if(c)c.scrollLeft=UI.catScroll;},0);
   const item=row=>'<button type="button" class="item'+(row.fits?"":" dim")+'" data-id="'+esc(row.p.id)+'"><span class="ms wine" data-ms="'+money(row.pr.price)+'" style="--ms:14px;min-width:64px"></span>'+
-    '<div style="min-width:0"><h3>'+esc(row.p.name)+(row.saved>0?'<span class="saved">−£'+row.saved.toFixed(2)+'</span>':'')+'</h3><div class="meta">'+esc(row.of.item)+' · '+esc(hoursLabel(row.o,row.t||t))+(row.ask.length?' · <span class="diet">ask staff</span>':'')+(row.p.age>30?' · checked '+row.p.age+' days ago':'')+'</div></div>'+
+    '<div style="min-width:0"><h3>'+esc(row.p.name)+(row.saved>0?'<span class="saved">−£'+row.saved.toFixed(2)+'</span>':'')+'</h3><div class="meta">'+esc(row.of.item)+' · '+esc(hoursLabel(row.o,row.t||t))+(row.ask.length?' · <span class="diet">ask staff</span>':'')+'</div></div>'+
     '<div class="walk">'+row.walk+' min<small>walk</small>'+(row.more?'<small>+'+row.more+' more</small>':'')+'</div></button>';
   const seenB={};const fitRows=[];for(const row of r.fit){const k=row.p.name+"|"+row.of.item+"|"+row.pr.price;if(seenB[k]){seenB[k].more=(seenB[k].more||0)+1;continue;}seenB[k]=row;fitRows.push(row);}
   const fitEl=d.querySelector("#fit");if(fitEl)fitEl.innerHTML=fitRows.map(item).join("");
@@ -1764,10 +1785,10 @@ function vResults(){
   return d;
 }
 
-const PSTATUS={uni:"Price: the university’s own food pages, Oct 2026. Student price where it says so.","guide-hint":"Price: UCL says “under a fiver”; exact menu price to confirm.",press:"Price: press, 2025–26.",photo:"Price: menu photographed in store, 13 Oct 2026. Takeaway; sitting in can cost more.",tracked:"Price: UK price tracker, Oct 2026. London can be a touch higher.",fan:"Price: fan site, Oct 2026. London shelf price may be a step higher.",avg:"Price: UK average, 2025–26. Central London usually 15–25% more.",event:"",added:"Price: read by Claude from your photo. Check the board.",app:"Price: Food at UCL app, 13 Oct 2026.",web:"Price: the shop’s own website, Oct 2026.",est:"Price: estimate, to confirm."};
+const PSTATUS={uni:"Price: the university’s own food pages, Oct 2026. Student price where it says so.","guide-hint":"Price: UCL says “under a fiver”; exact menu price to confirm.",press:"Price: press, 2025–26.",photo:"Price: menu photographed in store, 13 Oct 2026. Takeaway; sitting in can cost more.",tracked:"Price: UK price tracker, Oct 2026. London can be a touch higher.",fan:"Price: fan site, Oct 2026. London shelf price may be a step higher.",avg:"Price: UK average, 2025–26. Central London usually 15–25% more.",event:"",added:"Prices can change. Check the board.",app:"Price: Food at UCL app, 13 Oct 2026.",web:"Price: the shop’s own website, Oct 2026.",est:"Price: estimate, to confirm."};
 function openSheet(row){
   const host=document.getElementById("sheetHost");const t=row.t||selectedTime();const rows=ladder(row.p,row.of,t);
-  const src=row.p.status==="guide"?'<span class="badge ok">'+(row.p.uni?esc(uniShort(row.p.uni))+" food pages":"Food at UCL guide")+'</span>':row.p.status==="event"?'<span class="badge ok">confirmed event</span>':row.p.status==="added"?'<span class="badge">added by '+esc(row.p.addedBy||"you")+' · not verified yet</span>':'<span class="badge">'+(row.p.status==="approx"?"hours to confirm":"address checked")+'</span>';
+  const src=row.p.status==="guide"?'<span class="badge ok">'+(row.p.uni?esc(uniShort(row.p.uni))+" food pages":"Food at UCL guide")+'</span>':row.p.status==="event"?'<span class="badge ok">confirmed event</span>':row.p.status==="added"?'':'<span class="badge">'+(row.p.status==="approx"?"hours to confirm":"address checked")+'</span>';
   const pstatus=(row.of.status==="uni"&&row.p.uni?"Price: "+uniShort(row.p.uni)+" food pages, Oct 2026. Student price where it says so.":PSTATUS[row.of.status]!==undefined?PSTATUS[row.of.status]:PSTATUS.est)+(row.of.check?" Check at the till.":"")+(row.of.uniOnly?" "+uniShort(row.p.uni)+" students only.":"");
   const dl=state.diet.size?dietLabel(row.of):"";
   host.innerHTML='<div class="sheetWrap" id="sheetWrap"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(row.p.name)+'">'+
@@ -1809,7 +1830,7 @@ function openTeach(place){
     '<p class="note" style="margin-top:18px"><button type="button" class="linkbtn" id="evtOpen">Got a free-food invite? Paste it →</button></p>'+
     '<div class="reveal" id="evtBox" hidden>'+(()=>{const im=moment("invite","invite");return '<div class="mhead">'+rat(im.pose,72)+'<p class="lead">'+esc(im.line)+'</p></div>';})()+'<p class="note">Claude checks there really is free food, picks the date and time, and adds it as a FREE result (+10 crumbs).</p>'+
     '<textarea id="evtText" class="line" rows="3" placeholder="Paste the event text here" style="font-family:var(--body);font-style:normal;font-size:15px"></textarea><div class="chips"><select id="evtVenue" class="chip"></select><button type="button" class="chip" id="evtBtn">Check it with Claude</button></div><p class="note" id="evtNote"></p></div>'+
-    '<p class="note" style="margin-top:14px"><b id="teachRank">'+(state.crumbs||0)+' crumbs · '+esc(rankName(state.crumbs||0))+'</b>. A menu photo accepted is +10, a typed menu +3, a free-food invite +10. Everything you add is marked “added by '+esc(firstName()||"you")+' · not verified yet”.</p>'+
+    '<p class="note" style="margin-top:14px"><b id="teachRank">'+(state.crumbs||0)+' crumbs · '+esc(rankName(state.crumbs||0))+'</b>. A menu photo accepted is +10, a typed menu +3, a free-food invite +10. Thanks for teaching me. Everyone nearby will see it.</p>'+
     '</div></div>';
   msRender(host);
   const wrap=document.getElementById("sheetWrap");const sheet=wrap.querySelector(".sheet");const close=()=>{host.innerHTML="";};
@@ -2134,7 +2155,7 @@ function wireMenu(d,place){
     d.querySelectorAll("#tPhotoRow label").forEach(l=>l.hidden=!canPhoto);q("#tTypeBtn").hidden=!canPhoto;q("#tTypeBox").hidden=canPhoto;if(!canPhoto)q("#tTypeIn").focus();
     note.textContent=teachCount()>=TEACH_MAX?"Five a day is the limit. Even for rats. Back tomorrow.":"The board or the shelf label, close and straight. Or type it.";};
   const typeInstead=msg=>{check.textContent=msg;note.textContent="";const box=q("#tTypeBox");box.hidden=false;q("#tTypeIn").focus();};
-  const choosePlace=r=>{T.at={lat:r.lat,lon:r.lon,label:r.sub||r.name};T.shop={name:r.name,lat:r.lat,lon:r.lon,src:r.src||"photon",addr:r.sub||"",placeId:r.placeId||""};closeL();ready();};
+  const choosePlace=r=>{T.at={lat:r.lat,lon:r.lon,label:r.sub||r.name};T.shop={name:r.name,lat:r.lat,lon:r.lon,src:r.src||"photon",addr:r.sub||"",placeId:r.placeId||"",hours:r.hours||null};closeL();ready();};
   const chooseAddress=r=>{const ks=nameKey(abbrStreet(r.name)),st=new Set(nameKey(r.sub||""));const label=ks.length&&ks.every(w=>st.has(w))?r.sub:r.name+(r.sub?", "+r.sub:"");T.at={lat:r.lat,lon:r.lon,label};T.shop=null;closeL();fixLine();q("#ts1").textContent=label;shopAsk.hidden=false;shopIn.value="";shopIn.focus();};
   shopIn.oninput=()=>{const v=shopIn.value.trim();if(v.length>=2){T.shop={name:v.slice(0,40),lat:T.at.lat,lon:T.at.lon,src:"typed",addr:T.at.label};q("#ts1").textContent=T.shop.name;}else{T.shop=null;q("#ts1").textContent=T.at?T.at.label:"";}};
   shopIn.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();if(T.shop)ready();}};
@@ -2187,7 +2208,7 @@ function wireMenu(d,place){
     sb.innerHTML='<p class="body"><b>'+esc(shown||"Name on the board")+'</b>'+(showAddr?' · '+esc(T.at.label):'')+'</p>'+
       (needName?'<input class="line" id="tNameIn" placeholder="Name as it is on the board" autocomplete="off" style="font-family:var(--body);font-style:normal;font-size:16px;margin-bottom:8px">':'')+
       '<div class="prices">'+keep.map(x=>'<div class="pr"><div>'+esc(x.item)+'</div><span class="ms wine" data-ms="'+money(x.price)+'" style="--ms:13px"></span></div>').join("")+'</div>'+
-      '<p class="note">'+(T.via==="photo"?"Read by Claude from your photo. ":"Typed, so it goes in as “not verified yet”. ")+'Shows as “added by '+esc(firstName()||"you")+' · not verified yet”.</p>'+
+      '<p class="note">Thanks for teaching me. Everyone nearby will see it.</p>'+
       '<div class="act" style="margin-top:6px">'+navNext("menuAdd","Send to Fiver")+'</div><p class="note" id="menuSaved"></p>';msRender(sb);
     sb.querySelector("#menuAdd").onclick=async()=>{const btn=sb.querySelector("#menuAdd"),saved=sb.querySelector("#menuSaved");
       const typedName=needName?(sb.querySelector("#tNameIn").value||"").trim().slice(0,40):"";if(needName&&typedName.length<2){saved.textContent="Type the name as it is on the board.";return;}
@@ -2199,11 +2220,12 @@ function wireMenu(d,place){
       else if(T.shop.src==="osm"||T.shop.src==="photon")coordSource="osm";
       if(T.shop.src==="google"){const alt=await osmLookup(finalName,T.shop);if(alt){address=alt.sub||"";if(coordSource!=="gps"){lat=alt.lat;lon=alt.lon;coordSource="osm";}}else if(coordSource!=="gps")coordSource="google";}
       const offers=keep.map(x=>({cat:CATS.some(c=>c.id===x.cat)?x.cat:"snack",item:String(x.item).slice(0,60),price:Math.round(x.price*100)/100,status:"added",tags:Array.isArray(x.tags)?x.tags.filter(t=>typeof t==="string"):[]}));
-      state.added.push({id:"menu-"+Date.now(),name:finalName,lat,lon,hoursUnknown:true,addr:address||T.shop.addr||T.at.label||"",status:"added",addedBy:firstName()||"you",nearby,via:T.via,placeId:T.shop.placeId||"",coordSource,offers,
-        why:(T.via==="photo"?"Read by Claude from a photo"+(nearby?" taken on site":far!=null?" taken "+far+" m away":""):"Typed in by "+(firstName()||"a student"))+". Hours unknown. Not verified yet."});
+      const known=baseFor({name:finalName,lat,lon,placeId:T.shop.placeId||""},PLACES.concat(uniPlaces().filter(uniOk)));const gh=!known&&T.shop.hours?T.shop.hours:null;
+      state.added.push({id:"menu-"+Date.now(),name:known?known.name:finalName,lat:known?known.lat:lat,lon:known?known.lon:lon,hoursUnknown:!gh,hours:gh||undefined,baseId:known?known.id:undefined,addr:address||T.shop.addr||T.at.label||"",status:"added",addedBy:firstName()||"you",nearby,via:T.via,placeId:T.shop.placeId||"",coordSource,offers,
+        why:""});
       teachBump();persist();render();
       const everyone=await saveShared({kind:"menu",place_name:finalName,address,lat,lon,items:offers.map(x=>({item:x.item,price:x.price,cat:x.cat,diet:x.tags})),added_by:firstName()||"a student",place_id:T.shop.placeId||null,coord_source:coordSource});
-      T.sent=true;setStep(3);btn.hidden=true;saved.textContent=(everyone?"Everyone nearby sees it. ":"Saved on this phone"+(shared.lastErr?" ("+shared.lastErr+")":"")+". ")+keep.length+" item"+(keep.length>1?"s":"")+" at "+finalName+" · not verified yet.";teachCelebrate(d,pts,"Cheers. That’s on the map now.");if(d.scrollTo)d.scrollTo({top:0,behavior:"smooth"});};};
+      T.sent=true;setStep(3);btn.hidden=true;saved.textContent=(everyone?"Everyone nearby sees it. ":"Saved on this phone"+(shared.lastErr?" ("+shared.lastErr+")":"")+". ")+keep.length+" item"+(keep.length>1?"s":"")+" at "+finalName+".";teachCelebrate(d,pts,"Cheers. That’s on the map now.");if(d.scrollTo)d.scrollTo({top:0,behavior:"smooth"});};};
   const cleanItems=j=>{const all=((j&&j.items)||[]).filter(x=>x&&typeof x.price==="number"&&x.item);const items=all.filter(x=>x.price>=0.2&&x.price<=15).slice(0,40);return {items,odd:all.length-items.length};};
   // the compact photo answer {"m","p","i":[[name,price,cat]]} → {isMenu,place,items:[{item,price,cat,tags}]}; the old long form still works
   const CATS1={h:"hot",s:"snack",c:"coffee",w:"sweet",d:"deal"};
@@ -2263,7 +2285,7 @@ function wireMenu(d,place){
     const byClaude=claudeAvailable();
     try{const j=!byClaude?parseMenuText(text):await askClaude('A student typed items and prices from a menu at "'+T.shop.name.replace(/"/g,"")+'" in London. Reply with JSON only: {'+ITEM_SHAPE+'}. Keep only items with a clear price in pounds. "hot" = hot food, "snack" = cold food, "coffee" = any drink, "sweet" = cakes and desserts.\n\nTEXT:\n'+text.slice(0,2000),{json:true,max:1000});
       const {items,odd}=cleanItems(j);if(!items.length){check.textContent=odd?"Those prices don’t look right (under £0.20 or over £15). Not saved.":(byClaude?"Claude couldn’t find prices in that. Try “flat white £2.60, soup £3.20”.":"I couldn’t spot any prices. Try “flat white £2.60, soup £3.20”.");note.textContent="";return;}
-      showItems(items,odd,"");check.textContent="Typed, so it goes in as “not verified yet” (+3). A photo is +10.";}
+      showItems(items,odd,"");check.textContent="Typed menus are +3. A photo is +10.";}
     catch(e){check.textContent=claudeErr(e,"Claude didn’t answer. Try again.");note.textContent="";}
     finally{btn.disabled=false;}};
   d.__teach=T; // for tests
@@ -2290,7 +2312,7 @@ function afterNote(sel,text){const n=document.querySelector(sel);if(!n)return;n.
 function addHours(hhmm,h){const m=hm(hhmm)+h*60;return String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");}
 
 /* ---------- FOOT & BOOT ---------- */
-const SOURCES='<p class="body">UCL outlet hours and addresses: the printed Food at UCL guide 2026/27 and the Food at UCL app.</p><p class="body">Chain prices: menus photographed in store (Pret, itsu, GAIL’s, Leon, Tortilla, Wasabi, atis, Costa) and UK price trackers, Oct 2026, takeaway. Sitting in can cost more.</p><p class="body">Meal deals: national press, Aug 2025. Shop addresses: store locators, Oct 2026.</p><p class="body">What students teach Fiver shows as “added by {name} · not verified yet” until someone checks it.</p><p class="body">Walking at 80 m/min; 6 minutes to eat on the go, 12 to sit down.</p><p class="body">Allergens change: always ask staff.</p>';
+const SOURCES='<p class="body">UCL outlet hours and addresses: the printed Food at UCL guide 2026/27 and the Food at UCL app.</p><p class="body">Chain prices: menus photographed in store (Pret, itsu, GAIL’s, Leon, Tortilla, Wasabi, atis, Costa) and UK price trackers, Oct 2026, takeaway. Sitting in can cost more.</p><p class="body">Meal deals: national press, Aug 2025. Shop addresses: store locators, Oct 2026.</p><p class="body">What students teach Fiver shows up for everyone nearby. Prices can change: check the board.</p><p class="body">Walking at 80 m/min; 6 minutes to eat on the go, 12 to sit down.</p><p class="body">Allergens change: always ask staff.</p>';
 document.getElementById("foot").innerHTML='<div class="installBox"></div>';
 if(DEMO.where){const v=VENUES.find(x=>x.id===DEMO.where);if(v){state.uni="ucl";state.where={lat:v.lat,lon:v.lon,label:v.name};state.setupDone=true;state.seenResults=true;state.step=S.results;}}
 window.__fiver={state,render,rank,selectedTime,unlock,S,openMenu,openTeach,todayDeals,cardUnlocks,UI,addCrumbs,rankName,nameMatch,teachCount,photonRows,shared,loadShared,sharedPlace,ON_SITE,DEVICE_ID,DEMO,MOMENTS,moment,pickMoment,ART,ARTW,UNIS,UNI_LIST,uniPlaces,allPlaces,persist,openSheet,msRender,cardsFor,footText,isOpen,hoursLabel,metres,startAgain,areaName,openInstallSheet,rankName,looseJSON};
