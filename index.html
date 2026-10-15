@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<style>html,body{background:#FFF7EB;margin:0}</style>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <!--PWA--><meta name="theme-color" content="#59211F">
@@ -17,8 +18,8 @@
 <meta property="og:site_name" content="Fed for a Fiver">
 <meta property="og:title" content="Fed for a Fiver">
 <meta property="og:description" content="Under a fiver, near you. Food near UCL priced with your student cards.">
-<meta property="og:url" content="https://oliviagallego.github.io/fiver/">
-<meta property="og:image" content="https://oliviagallego.github.io/fiver/og-image.png">
+<meta property="og:url" content="https://fedforafiver.com/">
+<meta property="og:image" content="https://fedforafiver.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -1159,8 +1160,8 @@ function buildDrawnMap(svg,opts){
    Keys here are the public ones (Supabase publishable key, a Google key restricted to the site). The Supabase secret key is never in the app. Photos are never uploaded. */
 const SB_URL="https://fctqyxhxbxoojejcyfon.supabase.co";
 const SB_KEY="sb_publishable_WLXyQ-ETrW3aQ3k_C9oIJw_Bi79zZU5";
-const GP_KEY="AIzaSyDlV1NllOA93DmFjt7bcc8x5u-s70KNg2g"; // restricted to https://oliviagallego.github.io/* — works nowhere else
-const ON_SITE=(()=>{try{return !(window.claude&&window.claude.use)&&typeof fetch==="function"&&(/github\.io$/.test(location.hostname)||localStorage.getItem("fiver.shared")==="1");}catch(e){return false;}})();
+const GP_KEY="AIzaSyDlV1NllOA93DmFjt7bcc8x5u-s70KNg2g"; // restricted to https://oliviagallego.github.io/* and https://fedforafiver.com (+ www) — works nowhere else
+const ON_SITE=(()=>{try{return !(window.claude&&window.claude.use)&&typeof fetch==="function"&&(/(^|\.)github\.io$|^(www\.)?fedforafiver\.com$/.test(location.hostname)||localStorage.getItem("fiver.shared")==="1");}catch(e){return false;}})();
 const DEVICE_ID=(()=>{try{let d=localStorage.getItem("fiver.device");if(!d){d=(crypto&&crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36));localStorage.setItem("fiver.device",d);}return d;}catch(e){return "anon";}})();
 const shared={rows:[],places:[],at:0,ok:null,loading:false};
 function fetchT(url,opts,ms){const ctl=typeof AbortController==="function"?new AbortController():null;const timer=ctl?setTimeout(()=>ctl.abort(),ms):null;
