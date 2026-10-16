@@ -495,7 +495,11 @@ details textarea{min-height:90px;resize:vertical}
 .qbox{display:flex;align-items:center;gap:4px;margin:6px 0 8px;background:#FFFDF8;border:1.2px solid var(--wine);border-radius:999px;padding:3px 4px 3px 16px}
 .qbox input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-family:var(--body);font-size:16px;color:var(--fg);padding:8px 0}
 .qbox input::placeholder{color:var(--muted)}
-.qbox .iconbtn{width:38px;height:38px}
+.qbox .iconbtn{width:38px;height:38px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.qbox .iconbtn.live{position:relative;background:var(--wine);color:#FFF7EB}
+.qbox .iconbtn.live::after{content:"";position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#FFF7EB;box-shadow:0 0 0 2px var(--wine)}
+@media (prefers-reduced-motion:no-preference){.qbox .iconbtn.live::after{animation:recdot 1s ease-in-out infinite}@keyframes recdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}}
+.qbox.rec{border-width:2px}
 .sub-tile.other{justify-content:flex-end;min-height:0}
 .sub-tile.other .ms{display:flex;align-items:center;justify-content:center;height:44px;filter:grayscale(1)}
 .sub-tile.other.on .ms{filter:none}
@@ -1883,7 +1887,7 @@ function dots(){
   ratPos=cur;
 }
 function go(n){state.step=n;render();window.scrollTo({top:0,behavior:"smooth"});}
-function render(){dots();const f=[vHello,vWhere,vResults][state.step];view.innerHTML="";view.appendChild(f());msRender(view);paintInstall();stageEnter();if(state.step===S.results)loadShared();}
+function render(){if(SAY.rec&&state.step!==S.results)stopSay();dots();const f=[vHello,vWhere,vResults][state.step];view.innerHTML="";view.appendChild(f());msRender(view);paintInstall();stageEnter();if(state.step===S.results)loadShared();}
 function startAgain(soft){ // the logo: like opening the app again. The search goes back to the defaults; name, uni, cards and diet stay; the URL (demo mode) stays.
   document.getElementById("sheetHost").innerHTML="";
   state.q="";state.cats=new Set();state.drinks=false;state.budget=5;state.mins=30;state.minute=null;state.dayOff=0;UI.spec=false;UI.later=false;UI.bOther=false;UI.mOther=false;UI.view="list";UI.lastFkey="";
@@ -2181,9 +2185,10 @@ function filtersHTML(){
 function wireFilters(d){
   const q=sel=>d.querySelector(sel);
   q("#catChips").addEventListener("click",e=>{const b=e.target.closest(".cat-tile");if(!b||b.id==="searchTile")return;const id=b.dataset.id;UI.lastCat=id;if(id==="drinks"){toggleDrinks();return;}state.drinks=false;if(state.cats.has(id)){state.cats.delete(id);if(state.sub&&state.sub.cat===id)state.sub=null;}else state.cats.add(id);persist();UI.catScroll=q("#catChips").scrollLeft;render();});
-  q("#searchTile").onclick=()=>{const i=q("#qIn");if(searchOn()&&!(i&&i.value.trim())&&!state.q){UI.searchOpen=false;render();return;}UI.searchOpen=true;UI.focusQ=true;render();};
+  q("#searchTile").onclick=()=>{const i=q("#qIn");if(searchOn()&&!(i&&i.value.trim())&&!state.q){stopSay();UI.searchOpen=false;render();return;}UI.searchOpen=true;UI.focusQ=true;render();};
   {const i=q("#qIn");if(i){if(UI.focusQ){UI.focusQ=false;setTimeout(()=>{try{i.focus();}catch(e){}},0);}
-    i.addEventListener("blur",()=>setTimeout(()=>{const a=document.activeElement;if(!i.isConnected||i.value.trim()||state.q||(a&&a.closest&&a.closest("#specBox,#searchTile")))return;UI.searchOpen=false;const sb=document.getElementById("specBox");if(sb)sb.remove();const t=document.getElementById("searchTile");if(t){t.classList.remove("on");t.setAttribute("aria-pressed","false");}},180));}}
+    // the buttons inside the box keep the focus (iPhone counts a tap on them as a blur); the box closes only on a tap outside it (sayOutside)
+    d.querySelectorAll("#specBox button").forEach(b=>b.addEventListener("pointerdown",e=>e.preventDefault()));}}
   if(q("#catClear"))q("#catClear").onclick=()=>{state.cats=new Set();state.drinks=false;state.sub=null;state.dsub="";persist();render();};
   if(q("#subChips"))q("#subChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
     const c=b.dataset.cat,id=b.dataset.sub;
@@ -2600,16 +2605,40 @@ function wireAsk(d,r){
     finally{b.disabled=false;if(wasPose)ratPose(wasPose);}};
 }
 /* Mic on an input (Web Speech), and the one-line parse */
+/* Mic in the search box (Web Speech). One recording at a time, in SAY; it survives a re-render of the box and stops when the box goes. */
+const SAY={rec:null,t:null,heard:false};
+function sayPaint(on){const m=document.getElementById("mic"),i=document.getElementById("qIn"),b=document.getElementById("specBox");
+  if(m){m.classList.toggle("live",on);m.setAttribute("aria-pressed",on?"true":"false");m.setAttribute("aria-label",on?"Stop listening":"Speak");}
+  if(b)b.classList.toggle("rec",on);if(i)i.placeholder=on?"Listening…":"Latte, pizza, sushi…";}
+function sayHint(t){const i=document.getElementById("qIn");if(i&&!i.value)i.placeholder=t;}
+function sayTimer(ms,fn){clearTimeout(SAY.t);SAY.t=setTimeout(fn,ms);}
+function stopSay(keep){const r=SAY.rec;SAY.rec=null;clearTimeout(SAY.t);SAY.t=null;
+  if(r){r.onresult=r.onerror=r.onend=r.onspeechstart=r.onspeechend=null;try{keep?r.stop():r.abort();}catch(e){}}sayPaint(false);}
+function closeSearch(){stopSay();UI.searchOpen=false;const sb=document.getElementById("specBox");if(sb)sb.remove();const t=document.getElementById("searchTile");if(t){t.classList.remove("on");t.setAttribute("aria-pressed","false");}}
+// a tap outside the whole box: while recording it only stops the mic; otherwise an empty box closes
+function sayOutside(e){const sb=document.getElementById("specBox");if(!sb)return;const t=e.target;if(t&&t.closest&&t.closest("#specBox,#searchTile"))return;
+  if(SAY.rec){stopSay();return;}const i=document.getElementById("qIn");if((i&&i.value.trim())||state.q)return;closeSearch();}
+document.addEventListener("pointerdown",sayOutside,true);
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&SAY.rec)stopSay();});
 function wireSay(d,inp,go){
-  const mic=d.querySelector("#mic");if(!mic)return;const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR||IN_CLAUDE)return;mic.hidden=false;let rec=null;const note=d.querySelector("#qNote");
-  mic.onclick=()=>{if(rec){rec.stop();return;}rec=new SR();rec.lang="en-GB";rec.interimResults=false;rec.maxAlternatives=5;mic.classList.add("live");if(note)note.textContent="Listening…";
+  const mic=d.querySelector("#mic");if(!mic){if(SAY.rec)stopSay();return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR||IN_CLAUDE)return;mic.hidden=false;const note=d.querySelector("#qNote");
+  if(SAY.rec){SAY.go=go;SAY.inp=inp;SAY.note=note;setTimeout(()=>sayPaint(true),0);} // the box was re-drawn mid-recording: same recording, new buttons
+  mic.onclick=e=>{e.preventDefault();if(SAY.rec){if(SAY.heard){const r=SAY.rec;sayTimer(2500,()=>stopSay());try{r.stop();}catch(x){stopSay();}}else stopSay();return;} // tap again: stop (and keep what was said)
+    let rec;try{rec=new SR();}catch(x){mic.hidden=true;return;}
+    rec.lang="en-GB";rec.interimResults=false;rec.maxAlternatives=5;rec.continuous=false;
+    SAY.rec=rec;SAY.heard=false;SAY.go=go;SAY.inp=inp;SAY.note=note;UI.searchOpen=true;
+    try{inp.blur();}catch(x){}sayPaint(true);
+    sayTimer(10000,()=>{if(SAY.rec===rec){stopSay();sayHint("Didn’t hear you. Type, or tap the mic");}}); // 10 s and no voice
+    rec.onspeechstart=()=>{if(SAY.rec!==rec)return;SAY.heard=true;sayTimer(12000,()=>{if(SAY.rec===rec){try{rec.stop();}catch(x){}sayTimer(2500,()=>stopSay());}});};
+    rec.onspeechend=()=>{if(SAY.rec!==rec)return;sayTimer(2500,()=>stopSay());}; // iPhone sometimes never ends on its own
     // up to 5 guesses: the first one the interpreter understands, else the first; then fill the box and search
-    rec.onresult=e=>{const r=e.results[e.results.length-1];const alts=[];for(let i=0;i<r.length;i++)alts.push(r[i].transcript);
-      const pick=alts.find(a=>typeof interpretWish==="function"&&interpretWish(a,nowParts().day).understood)||alts[0]||"";inp.value=pick;if(go&&pick)go(pick);};
-    rec.onerror=e=>{if(note)note.textContent=e.error==="not-allowed"||e.error==="service-not-allowed"?"The mic is blocked here. Allow it in the browser, or type.":"Didn’t catch that. Try again, or type.";};
-    rec.onend=()=>{mic.classList.remove("live");rec=null;if(note&&note.textContent==="Listening…")note.textContent="";};
-    try{rec.start();}catch(e){mic.hidden=true;}};
+    rec.onresult=ev=>{if(SAY.rec!==rec)return;const r=ev.results[ev.results.length-1];if(!r||(r.isFinal===false))return;const alts=[];for(let i=0;i<r.length;i++)alts.push(r[i].transcript);
+      const pick=(alts.find(a=>typeof interpretWish==="function"&&interpretWish(a,nowParts().day).understood)||alts[0]||"").trim();
+      const g=SAY.go,box=SAY.inp;stopSay();const i=document.getElementById("qIn")||box;if(i)i.value=pick;if(g&&pick)g(pick);};
+    rec.onerror=ev=>{if(SAY.rec!==rec)return;stopSay();if(ev.error!=="aborted")sayHint(ev.error==="not-allowed"||ev.error==="service-not-allowed"?"Mic blocked. Type it instead":"Didn’t catch that. Type, or try again");};
+    rec.onend=()=>{if(SAY.rec===rec)stopSay();};
+    try{rec.start();}catch(x){stopSay();mic.hidden=true;}};
 }
 // "something hot and veggie, £4, back in 20 min" → filters. Returns {budgetGiven,minsGiven} or null if Claude failed (note set).
 async function parseWish(text,note){
