@@ -583,6 +583,8 @@ details textarea{min-height:90px;resize:vertical}
 
 .inapp{background:#FFF7EB;border:1.2px solid var(--wine);border-radius:16px;padding:12px 14px;margin:6px 0}
 .inapp .body{margin:0 0 6px}
+
+.tipline{margin:8px 0;padding:8px 12px;border-left:3px solid var(--wine);background:#FFF7EB;border-radius:0 10px 10px 0;font-size:14px;line-height:1.35;color:var(--fg)}
 </style>
 </head>
 <body>
@@ -2540,6 +2542,7 @@ function openSheet(row){
     '<p class="lead">'+esc(row.of.item)+'</p><p class="meta"><b>'+esc(statusLine(row,t))+'</b></p>'+
     '<p class="meta">'+breakdown(row)+(row.of.in?' · '+money(row.of.in)+' if you sit in':'')+'</p>'+(row.p.why?'<p class="body">'+esc(row.p.why)+'</p>':'')+
     (dl?'<p class="diet">Diet: '+esc(dl)+'. Allergens change: ask staff.</p>':'')+
+    tipsFor(row.p).map(x=>'<p class="tipline">Tip from a student · not checked yet: '+esc(x)+'</p>').join("")+
     '<div class="chips"><a class="chip" data-walk="'+esc(row.p.id)+'" href="'+gmaps(row.p)+'" target="_blank" rel="noopener">'+PIN+' Walk there</a></div>'+
     '<div class="k" style="margin-top:10px">Your price</div><div class="prices">'+rows.map(x=>'<div class="pr'+(x.mine&&!x.promo?" mine":"")+'"><div>'+esc(x.label)+(x.mine&&x.label!=="No card"&&x.label!=="Everyone"?' · you have it':'')+(x.note?'<span class="why">'+esc(x.note)+'</span>':'')+'</div><span class="ms'+(x.mine&&!x.promo?' wine':'')+'" data-ms="'+money(x.price)+'" style="--ms:13px"></span></div>').join("")+'</div>'+
     (row.p.drinkRef&&isMeal(row.of)?'<p class="note">With a drink ≈ '+money(row.pr.price+row.p.drinkRef)+'</p>':'')+(row.p.service?'<p class="note">+ optional 12.5% service</p>':'')+
@@ -2573,8 +2576,12 @@ function openTeach(place){
     '<div class="tpanel" id="t1"><p class="note">'+(place?'Is <b>'+esc(place.name)+'</b> still right?':'Which café, shop or address?')+'</p><p class="meta" id="tAt" hidden></p><div id="tFind"><div class="combo"><div class="wishrow"><span class="iconbtn" aria-hidden="true">'+SRCH+'</span><input class="line" id="tWhereIn" placeholder="Search a café, restaurant or address" autocomplete="off" style="font-family:var(--body);font-style:normal;font-size:16px"><button type="button" class="iconbtn" id="tWhereClear" aria-label="Close" hidden>'+X+'</button></div><div class="list" id="tWhereList" hidden></div></div>'+
       '<div class="chips" style="margin-top:8px"><button type="button" class="chip" id="tGeo">'+PIN+' Use my location</button></div><p class="meta" id="tWhereNote"></p><div class="nearlist" id="tNear" hidden></div></div>'+
       '<div id="tShopAsk" hidden><input class="line" id="tShopIn" placeholder="Shop name" autocomplete="off" style="font-family:var(--body);font-style:normal;font-size:16px"></div></div>'+
-    '<div class="tpanel" id="t2" hidden><div class="chips" id="tPhotoRow"><label class="chip">'+CAM+' Take a photo<input type="file" id="menuFile" accept="image/*" capture="environment" hidden></label><label class="chip">Choose a photo<input type="file" id="menuFile2" accept="image/*" multiple hidden></label><button type="button" class="chip" id="tTypeBtn">Type it instead</button></div>'+
-      '<div id="tTypeBox" hidden style="margin-top:8px"><textarea id="tTypeIn" class="line" rows="3" placeholder="Flat white £2.60, sausage roll £1.85…" style="font-family:var(--body);font-style:normal;font-size:15px"></textarea><div class="chips" style="margin-top:6px"><button type="button" class="chip" id="tTypeGo">Read it</button></div></div>'+
+    '<div class="tpanel" id="t2" hidden><div class="chips" id="tPhotoRow"><label class="chip">'+CAM+' Take a photo<input type="file" id="menuFile" accept="image/*" capture="environment" hidden></label><label class="chip">Choose a photo<input type="file" id="menuFile2" accept="image/*" multiple hidden></label><button type="button" class="chip" id="tTypeBtn">Type it instead</button><button type="button" class="chip" id="tDealBtn">Tell me a deal</button></div>'+
+      '<div id="tTypeBox" hidden style="margin-top:8px"><textarea id="tTypeIn" class="line" rows="3" placeholder="Flat white £2.60, sausage roll £1.85…" style="font-family:var(--body);font-style:normal;font-size:15px"></textarea><div class="chips" style="margin-top:6px"><button type="button" class="chip" id="tTypeGo">Read it</button></div></div><div id="tDealBox" hidden style="margin-top:10px"><div class="chips" id="tDealKind"><button type="button" class="chip" data-k="student">Student discount</button><button type="button" class="chip" data-k="oneoff">One-off offer</button></div>'+
+        '<div id="tDealStudent" hidden><input class="line" id="tDealAmt" placeholder="How much? 10% or £1 off" maxlength="40" autocomplete="off" style="font-family:var(--body);font-style:normal;font-size:16px"><div class="k" style="margin-top:10px">What do you show?</div><div class="chips" id="tDealShow">'+DEAL_SHOW.map(x=>'<button type="button" class="chip" data-show="'+esc(x)+'">'+esc(x)+'</button>').join("")+'</div></div>'+
+        '<div id="tDealOne" hidden><input class="line" id="tDealWhat" placeholder="What is it? Free cookie with any coffee" maxlength="80" autocomplete="off" style="font-family:var(--body);font-style:normal;font-size:16px"><div class="k" style="margin-top:10px">Until when?</div><input type="date" class="line" id="tDealEnd" style="font-family:var(--body);font-style:normal;font-size:16px"><p class="note">No date? I’ll keep it for 3 days.</p></div>'+
+        '<div id="tDealNameBox" hidden><input class="line" id="tDealName" placeholder="Name as it is on the shop sign" maxlength="40" autocomplete="off" style="font-family:var(--body);font-style:normal;font-size:16px;margin-top:8px"></div>'+
+        '<div class="act" id="tDealAct" hidden style="margin-top:8px">'+navNext("tDealSend","Send to Fiver")+'</div><p class="note" id="tDealNote"></p></div>'+
       '<p class="limitbox" id="tLimit" role="status" hidden></p><p class="note" id="menuNote"></p><p class="note" id="tCheck"></p><div class="chips" id="tWhich"></div><div id="menuOut"></div></div>'+
     '<div class="tpanel" id="t3" hidden><div id="sendBox"></div></div>'+
     '<p class="note" style="margin-top:18px"><button type="button" class="linkbtn" id="evtOpen">Got a free-food invite? Paste it →</button></p>'+
@@ -2695,12 +2702,25 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 // the first time on the main screen, after name, uni and diet; never over a sheet (install, 18+) and never on the Drinks screen
 function maybeTour(){if(TOUR.on||tourDone()||state.step!==S.results||!state.setupDone||state.drinks||!tourCan())return;
   setTimeout(()=>{if(TOUR.on||tourDone()||state.step!==S.results||state.drinks||document.querySelector("#sheetWrap"))return;if(document.querySelector("#view #catChips"))startTour(false);},900);}
+/* Tips from students ("Tell me a deal"): a line on the open card, never the price. One-offs stop after their date. */
+const DEAL_SHOW=["Student ID","UNiDAYS","Student Beans","TOTUM","Nothing"];
+function myTips(){try{const a=JSON.parse(localStorage.getItem("fiver.tips")||"[]");return Array.isArray(a)?a:[];}catch(e){return [];}}
+function addTip(t){const a=myTips().filter(x=>!x.ends_at||Date.parse(x.ends_at)>Date.now());a.unshift(t);try{localStorage.setItem("fiver.tips",JSON.stringify(a.slice(0,50)));}catch(e){}}
+function tipText(it,ends){const show=it.show&&it.show!=="Nothing"&&!/\bwith\b/i.test(it.text)?" with "+it.show:"";
+  let until="";if(it.type==="oneoff"&&ends){const d=new Date(ends);if(!isNaN(d))until=" · until "+DAYS[d.getDay()]+" "+d.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()];}
+  return it.text+show+until;}
+function tipsFor(p){if(!p||typeof p.lat!=="number")return [];const now=Date.now(),out=[];
+  const rows=myTips().concat((shared.rows||[]).filter(r=>r&&r.kind==="deal"&&r.device_id!==DEVICE_ID));
+  for(const r of rows){if(r.ends_at&&Date.parse(r.ends_at)<=now)continue;const lat=Number(r.lat),lon=Number(r.lon);if(isNaN(lat)||isNaN(lon))continue;
+    const same=(p.placeId&&r.place_id&&p.placeId===r.place_id)||(metres(p,{lat,lon})<=120&&nameKey(r.place_name||"").length&&nameKey(p.name||"").length&&nameMatch(p.name,r.place_name));
+    if(!same)continue;for(const it of (Array.isArray(r.items)?r.items:[])){if(!it||typeof it.text!=="string"||!it.text.trim())continue;const t=tipText({type:it.type==="oneoff"?"oneoff":"student",text:it.text.slice(0,80),show:typeof it.show==="string"?it.show.slice(0,20):""},r.ends_at);if(!out.includes(t))out.push(t);}}
+  return out.slice(0,3);}
 /* The end of Teach: the price list goes, the rat says thanks, the crumbs and the rank; Teach another or Done */
 const THANKS_X=["Legend. The next hungry student owes you one.","Menu saved. You’re officially a rat with a cause.","That board is now mine. And everyone’s."];
-function teachThanks(sheet,box,n,status){addCrumbs(n);const nm=firstName();const pose=Math.random()<0.5?"cheer":"f_excited";const extra=THANKS_X[Math.floor(Math.random()*THANKS_X.length)];
+function teachThanks(sheet,box,n,status,lead){addCrumbs(n);const nm=firstName();const pose=Math.random()<0.5?"cheer":"f_excited";const extra=THANKS_X[Math.floor(Math.random()*THANKS_X.length)];
   ["#teachHead","#trow","#t1","#t2","#evtBox"].forEach(s=>{const e=sheet.querySelector(s);if(e)e.hidden=true;});const t3=sheet.querySelector("#t3");if(t3)t3.hidden=false;
   [sheet.querySelector("#evtOpen"),sheet.querySelector("#teachRank")].forEach(e=>{const pp=e&&e.closest("p");if(pp)pp.hidden=true;});
-  box.innerHTML='<div class="thanks" id="tThanks">'+rat(pose,128)+'<p class="lead">Thanks'+(nm?", "+esc(nm):"")+'! You just fed everyone near '+esc(areaName())+'.</p><p class="body">'+esc(extra)+'</p>'+
+  box.innerHTML='<div class="thanks" id="tThanks">'+rat(pose,128)+'<p class="lead">'+(lead?esc(lead):'Thanks'+(nm?", "+esc(nm):"")+'! You just fed everyone near '+esc(areaName())+'.')+'</p>'+(lead?'':'<p class="body">'+esc(extra)+'</p>')+
     '<p class="crumbline"><b>+'+n+' crumbs · '+esc(rankName(state.crumbs||0))+'</b></p><div class="act">'+navNext("tAgain","Teach another")+'<button type="button" class="chip" id="tDone">Done</button></div><p class="note">'+esc(status)+'</p></div>';
   msRender(box);const r=sheet.querySelector("#teachRank");if(r)r.textContent=(state.crumbs||0)+" crumbs · "+rankName(state.crumbs||0);
   box.querySelector("#tAgain").onclick=()=>openTeach();box.querySelector("#tDone").onclick=()=>{document.getElementById("sheetHost").innerHTML="";};}
@@ -3182,6 +3202,32 @@ function wireMenu(d,place){
     teachFace(d,"f_hearts","Got "+P.items.length+" item"+(P.items.length>1?"s":"")+(P.n>1?" from "+P.n+" photos":"")+". Untick what’s wrong.");showAll();paintMore(from);};
   file.onchange=()=>onFile(file,"cam");if(file2){file2.multiple=true;file2.onchange=()=>onFile(file2,"lib");}
   q("#tTypeBtn").onclick=()=>{const box=q("#tTypeBox");box.hidden=!box.hidden;if(!box.hidden)q("#tTypeIn").focus();};
+  // --- "Tell me a deal": a student discount or a one-off offer at the place picked above. No photos; a tip, never a price ---
+  const D={kind:"",show:""};
+  q("#tDealBtn").onclick=()=>{const box=q("#tDealBox");box.hidden=!box.hidden;q("#tDealBtn").classList.toggle("on",!box.hidden);if(box.hidden)return;
+    q("#tTypeBox").hidden=true;q("#tDealNameBox").hidden=!(T.shop&&T.shop.src==="google");}; // Google's name never goes into Fiver: the sign's does
+  q("#tDealKind").addEventListener("click",e=>{const b=e.target.closest("button[data-k]");if(!b)return;D.kind=b.dataset.k;q("#tDealKind").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+    q("#tDealStudent").hidden=D.kind!=="student";q("#tDealOne").hidden=D.kind!=="oneoff";q("#tDealAct").hidden=false;q("#tDealNote").textContent="";
+    const f=q(D.kind==="student"?"#tDealAmt":"#tDealWhat");if(f)f.focus();});
+  q("#tDealShow").addEventListener("click",e=>{const b=e.target.closest("button[data-show]");if(!b)return;D.show=b.dataset.show;q("#tDealShow").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));});
+  q("#tDealSend").onclick=async()=>{const n=q("#tDealNote"),btn=q("#tDealSend");
+    if(!T.shop){n.textContent="Pick the shop first, above.";return;}
+    if(teachCount()>=TEACH_MAX){n.textContent="Ten a day is the limit. Even for rats.";return;}
+    const text=(D.kind==="student"?q("#tDealAmt").value:q("#tDealWhat").value).trim().replace(/\s+/g," ").slice(0,D.kind==="student"?40:80);
+    if(!D.kind){n.textContent="Student discount or one-off offer?";return;}
+    if(text.length<2){n.textContent=D.kind==="student"?"How much off? For example 10% or £1 off.":"What’s the offer?";return;}
+    if(D.kind==="student"&&!D.show){n.textContent="What do you show at the till?";return;}
+    const needName=T.shop.src==="google";const typed=needName?(q("#tDealName").value||"").trim().slice(0,40):"";if(needName&&typed.length<2){n.textContent="Type the name as it is on the shop sign.";return;}
+    const finalName=needName?typed:T.shop.name;btn.disabled=true;n.textContent="Sending…";
+    let lat=T.shop.lat,lon=T.shop.lon,address=needName?"":(T.shop.addr||(T.at&&T.at.label)||""),coordSource=T.shop.src==="osm"||T.shop.src==="photon"?"osm":needName?"google":"manual";
+    if(needName){const alt=await osmLookup(finalName,T.shop);if(alt){address=alt.sub||"";lat=alt.lat;lon=alt.lon;coordSource="osm";}}
+    const endV=q("#tDealEnd")?q("#tDealEnd").value:"";const ends=D.kind==="oneoff"?(endV?new Date(endV+"T23:59:00"):new Date(Date.now()+3*86400e3)):null;
+    const item={type:D.kind,text,show:D.kind==="student"?D.show:""};
+    addTip({place_name:finalName,lat,lon,place_id:T.shop.placeId||"",items:[item],ends_at:ends?ends.toISOString():null,created_at:new Date().toISOString(),mine:true});
+    teachBump();
+    const row={kind:"deal",place_name:finalName,address,lat,lon,place_id:T.shop.placeId||null,items:[item],added_by:firstName()||"a student",coord_source:coordSource};if(ends)row.ends_at=ends.toISOString();
+    const everyone=await saveShared(row);
+    T.sent=true;setStep(3);teachThanks(d,q("#sendBox"),10,(everyone?"Everyone nearby sees it. ":"Saved on this phone"+(shared.lastErr?" ("+shared.lastErr+")":"")+". ")+"Tip at "+finalName+": "+tipText(item,row.ends_at)+".","A secret discount? Noted. You just saved someone a quid.");};
   q("#tTypeGo").onclick=async()=>{const text=q("#tTypeIn").value.trim();if(!text||!T.shop){note.textContent="Type the items and prices first.";return;}
     if(!claudeAvailable()){note.textContent="";}
     const btn=q("#tTypeGo");btn.disabled=true;note.textContent="Sorting that out…";out.innerHTML="";which.innerHTML="";check.textContent="";T.keep=null;T.via="text";q("#ts3").textContent="+3 crumbs";
