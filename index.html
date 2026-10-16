@@ -580,6 +580,9 @@ details textarea{min-height:90px;resize:vertical}
 .ttxt{margin:0 0 6px;font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.35;color:var(--fg)}
 .tbtns{display:flex;align-items:center;justify-content:space-between;gap:10px}
 @media (prefers-reduced-motion:reduce){.tspot,.tbub{transition:none}}
+
+.inapp{background:#FFF7EB;border:1.2px solid var(--wine);border-radius:16px;padding:12px 14px;margin:6px 0}
+.inapp .body{margin:0 0 6px}
 </style>
 </head>
 <body>
@@ -2766,19 +2769,31 @@ function isAndroid(){return /Android/i.test(navigator.userAgent);}
 function paintInstall(){document.querySelectorAll(".installBox").forEach(b=>{b.innerHTML=installable()?'<button type="button" class="chip">'+DL+' Install the app</button>':(standalone()?'<p class="note">Installed. You’re in the app.</p>':'');const btn=b.querySelector("button");if(btn)btn.onclick=doInstall;});}
 async function promptInstall(){if(!installEvt)return false;try{installEvt.prompt();const r=await installEvt.userChoice;if(r&&r.outcome==="accepted")installEvt=null;}catch(e){}paintInstall();return true;}
 async function doInstall(){openInstallSheet();}
+/* Which phone, which browser, inside which app: the install sheet shows the right steps on its own */
+function uaInfo(ua){ua=ua||navigator.userAgent||"";
+  const inApp=/Instagram/i.test(ua)?"Instagram":/musical_ly|TikTok|BytedanceWebview/i.test(ua)?"TikTok":/FBAN|FBAV|FB_IAB|FBIOS/i.test(ua)?"Facebook":null;
+  const br=/CriOS/.test(ua)?"chrome":/FxiOS/.test(ua)?"firefox":/EdgiOS/.test(ua)?"edge":"safari";
+  return {inApp,br,os:/Android/i.test(ua)?"android":"ios"};}
 function openInstallSheet(){
-  const host=document.getElementById("sheetHost");
+  if(standalone())return; // already installed: no window
+  const host=document.getElementById("sheetHost");const U=uaInfo();
   const STEPS={
+    "ios-chrome":[["Tap the Share icon at the top","It’s in the address bar. Can’t see it? Tap ··· then Share."],["Tap “Add to Home Screen”","Scroll down the list if you don’t see it."],["Tap Add","Fed for a Fiver lands on your home screen with the Fed for a Fiver icon and opens full-screen."]],
+    "ios-other":[["Tap ···","At the bottom or top of the screen, next to the address bar."],["Tap Share","Then scroll to “Add to Home Screen”."],["Tap “Add to Home Screen”, then Add","Fed for a Fiver lands on your home screen with the Fed for a Fiver icon and opens full-screen."]],
     ios:[["Open this page in Safari","If you are in another app’s browser, tap ··· first and choose Open in Safari."],["Tap Share","The square with an arrow. If you don’t see it, tap ··· first."],["Tap “Add to Home Screen”","Scroll down the list if you don’t see it."],["Tap Add","Fed for a Fiver lands on your home screen with the Fed for a Fiver icon and opens full-screen."]],
     android:[["Open this page in Chrome","If you are in another app’s browser, open the link in Chrome."],["Tap ⋮ (top right)","The three dots next to the address bar."],["Tap “Add to home screen”","Some phones say Install app."],["Tap Install","Fed for a Fiver lands on your home screen with the Fed for a Fiver icon and opens full-screen."]]};
   const tab=o=>'<div class="tabs" id="instTabs"><button type="button" class="chip'+(o==="ios"?" on":"")+'" data-os="ios">iPhone</button><button type="button" class="chip'+(o==="android"?" on":"")+'" data-os="android">Android</button></div>';
-  const stepsH=o=>'<p class="body">'+(o==="ios"?"Apple only lets you install from Safari’s Share menu:":"From Chrome’s menu, no store, no account:")+'</p><div class="steps">'+STEPS[o].map((s,i)=>'<div><b>'+(i+1)+'</b><div><div class="body">'+esc(s[0])+'</div><div class="note" style="margin-top:2px">'+esc(s[1])+'</div></div></div>').join("")+'</div>';
+  const INTRO={ios:"Apple only lets you install from Safari’s Share menu:","ios-chrome":"Tap the Share icon at the top, in the address bar, then “Add to Home Screen”. Can’t see it? Tap ··· then Share.","ios-other":"Tap ··· then Share, then “Add to Home Screen”.",android:"From Chrome’s menu, no store, no account:"};
+  const key=o=>o==="ios"&&U.os==="ios"?(U.br==="chrome"?"ios-chrome":U.br==="firefox"||U.br==="edge"?"ios-other":"ios"):o;
+  const stepsH=o=>{o=key(o);return '<p class="body">'+esc(INTRO[o])+'</p><div class="steps">'+STEPS[o].map((s,i)=>'<div><b>'+(i+1)+'</b><div><div class="body">'+esc(s[0])+'</div><div class="note" style="margin-top:2px">'+esc(s[1])+'</div></div></div>').join("")+'</div>';};
   const os=isAndroid()?"android":"ios";
+  // inside Instagram, TikTok or Facebook: first out to a real browser
+  const inAppH=U.inApp?'<div class="inapp"><p class="body"><b>You’re inside '+esc(U.inApp)+'.</b> Tap ··· at the top and choose “Open in browser” first.</p><p class="note">Then tap Install the app again and I’ll show you the steps.</p></div>':'';
   const im=moment("install","install-sheet",null,l=>MOMENTS.install.some(r=>r[0]===l&&r[1]==="a_phone")); // only the lines that go with the full-body rat holding the phone
   host.innerHTML='<div class="sheetWrap" id="sheetWrap"><div class="sheet" role="dialog" aria-modal="true" aria-label="Install the app"><button class="close" id="closeSheet">Close</button>'+
     '<span class="ms" data-ms="Install the app" style="--ms:18px"></span><div class="instHead"><div class="bubble"><p>'+esc(im.line)+'</p></div>'+rat("a_phone",110)+'</div>'+
     (standalone()?'<p class="body">Installed. You’re in the app.</p>':
-      (installEvt?'<div class="chips" style="margin:6px 0 12px"><button type="button" class="chip on" id="instPrompt">'+DL+' Install Fed for a Fiver</button></div><p class="note">Or by hand:</p>':'')+tab(os)+'<div id="instSteps">'+stepsH(os)+'</div>')+
+      U.inApp?inAppH:(installEvt?'<div class="chips" style="margin:6px 0 12px"><button type="button" class="chip on" id="instPrompt">'+DL+' Install Fed for a Fiver</button></div><p class="note">Or by hand:</p>':'')+tab(os)+'<div id="instSteps">'+stepsH(os)+'</div>')+
     '<p class="note" style="margin-top:14px">No app store, no account. Updates arrive on their own.</p></div></div>';
   msRender(host);
   const wrap=document.getElementById("sheetWrap");const close=()=>{host.innerHTML="";};
