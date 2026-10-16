@@ -2,7 +2,7 @@
    index.html: network first (no HTTP cache) so a fresh upload shows on the next reload, but never wait more than 3 s —
    after that the saved copy opens and the fresh one is saved for next time. No saved copy and no network: a small cream page,
    never a black screen. Icons and the manifest come from the cache. The cache name changes with every build. */
-const CACHE="fiver-v94";
+const CACHE="fiver-v102";
 const OFFLINE=()=>new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fed for a Fiver</title><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FFF7EB;color:#59211F;font:16px/1.4 system-ui,sans-serif;text-align:center;padding:24px"><p>No connection. Fiver will be here when you are back online.<br><br><a href="./" style="color:#59211F">Try again</a></p>',{headers:{"Content-Type":"text/html; charset=utf-8"}});
 const SHELL=["./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(SHELL.map(u=>c.add(new Request(u,{cache:"reload"})).catch(()=>null)))).then(()=>self.skipWaiting()));});

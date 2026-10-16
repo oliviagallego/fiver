@@ -518,6 +518,68 @@ details textarea{min-height:90px;resize:vertical}
 .cats .cat-tile:not(.search-tile){position:relative;z-index:1}
 .cats .search-tile+.cat-tile{margin-left:8px}
 .cats .search-tile{padding-top:8px;margin-top:-8px;padding-bottom:12px;margin-bottom:-12px}
+
+/* several things at once */
+.hero.combo .lead{font-weight:600}
+.combonote{margin:8px 0}
+/* the rat asks for a menu photo, inside the list */
+.ratask{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#FFF7EB;border:1.2px dashed var(--wine);border-radius:16px;padding:8px 12px 8px 6px;margin:6px 0;color:var(--fg);font-family:var(--body);font-size:14.5px;line-height:1.35}
+.ratask svg{flex:none}
+.ratask span{min-width:0}
+/* nudges: one line, with a cross; never a window */
+.nudge{display:flex;align-items:center;gap:6px;background:#FFF7EB;border:1.2px solid var(--wine);border-radius:14px;padding:4px 4px 4px 10px;font-size:14px;line-height:1.3}
+.nudge.top{margin:0 0 8px}
+.nudge.bottom{margin:16px 0 4px;border-color:var(--soft);background:transparent;color:var(--muted);font-size:13px}
+.nudgetxt{flex:1;min-width:0;display:flex;align-items:center;gap:8px;text-align:left;background:none;border:0;color:inherit;font:inherit;padding:4px 0}
+.nudgetxt svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2}
+.nudgex{flex:none;width:32px;height:32px;border-radius:50%;background:none;border:0;display:inline-flex;align-items:center;justify-content:center;color:inherit}
+.nudgex svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+/* the end of Teach */
+.thanks{text-align:center;padding:6px 0 4px}
+.thanks svg{display:block;margin:0 auto 6px}
+.thanks .lead{font-size:20px;margin:4px 0 6px}
+.thanks .crumbline{margin:10px 0 14px;color:var(--wine)}
+.thanks .act{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+/* first launch: a little arrow at the food types for 3 s */
+.taphint{position:relative;height:0;z-index:7;color:var(--wine)}
+.taphint svg{position:absolute;left:150px;top:-40px}
+@media (prefers-reduced-motion:no-preference){.taphint svg{animation:tapb .7s ease-in-out infinite alternate,tapout .35s ease var(--out,2.65s) forwards}@keyframes tapb{from{transform:translateY(-4px)}to{transform:translateY(6px)}}@keyframes tapout{to{opacity:0}}}
+
+/* sub-options of several food types in one row */
+.subs.multi{align-items:flex-start}
+.subgrp{flex:none;align-self:flex-start;writing-mode:horizontal-tb;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:2px 2px 0 0;white-space:nowrap;margin-right:-2px}
+.subsep{flex:none;align-self:stretch;width:1px;background:var(--soft);margin:4px 6px 18px 4px}
+/* combo cards: closed in the list, open for the detail */
+.ccard{border:1.2px solid var(--soft);border-radius:16px;margin:8px 0;background:#FFFDF8}
+.ccard.over{opacity:.75}
+.ccard.open{border-color:var(--wine)}
+.chead{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;background:none;border:0;padding:12px 14px;color:var(--fg);font:inherit}
+.ctop{display:flex;justify-content:space-between;align-items:baseline;width:100%;gap:8px}
+.cname{font-weight:600;font-size:16px}
+.cwalk{font-size:13px;color:var(--muted);white-space:nowrap}
+.ctot{display:flex;align-items:baseline;gap:8px;margin-top:2px}
+.cfor{font-size:14px;color:var(--wine)}
+.citems,.cmeal,.chas,.cover{font-size:13px;color:var(--muted);line-height:1.35}
+.cmeal{color:var(--wine)}
+.chas{color:var(--fg)}
+.cdetail{padding:0 14px 12px}
+.cgrp{margin:6px 0}
+.cgrp .k{margin:0 0 2px}
+
+/* the tour */
+.tour{position:fixed;inset:0;z-index:2000;pointer-events:none;display:none}
+.tour.show{display:block}
+.tblock{position:absolute;inset:0;pointer-events:auto}
+.tspot{position:fixed;border-radius:14px;box-shadow:0 0 0 200vmax rgba(0,0,0,.45);outline:2px solid #FFF7EB;transition:left .45s ease,top .45s ease,width .45s ease,height .45s ease;pointer-events:none;opacity:0}
+.trat{position:fixed;width:84px;height:80px;pointer-events:none;display:flex;align-items:flex-end;justify-content:center}
+.trat.flip{transform:scaleX(-1)}
+.trat .tf{display:none}.trat .tf.on{display:block}
+.trat svg{filter:drop-shadow(0 2px 0 #FFF7EB) drop-shadow(0 -2px 0 #FFF7EB) drop-shadow(2px 0 0 #FFF7EB) drop-shadow(-2px 0 0 #FFF7EB)}
+.tbub{position:fixed;pointer-events:auto;background:#FFF7EB;border:1.5px solid var(--wine);border-radius:18px;padding:12px 14px 8px;opacity:0;transform:translateY(4px);transition:opacity .2s ease,transform .2s ease;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.tbub.in{opacity:1;transform:none}
+.ttxt{margin:0 0 6px;font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.35;color:var(--fg)}
+.tbtns{display:flex;align-items:center;justify-content:space-between;gap:10px}
+@media (prefers-reduced-motion:reduce){.tspot,.tbub{transition:none}}
 </style>
 </head>
 <body>
@@ -1162,7 +1224,8 @@ const NOT_DRINK_RX=/batter|braised|sauce|glaze|cake|gravy|vinegar|ginger/i;
 const ADDON_RX=/^(upgrade|add|extra|swap|make it|top up|sub(stitute)?)\b|\bupgrade to\b|\badd[- ]?on\b/i;
 function foodOk(o){const t=o.item||"";if(ADDON_RX.test(t))return false;if(ALCOHOL_RX.test(t)&&!NOT_DRINK_RX.test(t))return false;return true;}
 function isMeal(o){if(!o||o.cat==="free"||o.cat==="drink")return false;if(SIDE_RX.test(o.item||""))return false;return o.cat==="hot"||o.cat==="deal"||MEAL_RX.test(o.item||"");}
-function mealMode(){return !state.q&&(state.cats.has("hot")||state.cats.has("deal"));}
+let RANK_ONLY=null; // one category only, no free food, no meal pick (used for "several things at once")
+function mealMode(){return !RANK_ONLY&&!state.q&&(state.cats.has("hot")||state.cats.has("deal"));}
 function eatMins(o){return o.cat==="deal"||o.cat==="coffee"||o.cat==="snack"?6:12;}
 /* Time of day for the dishes that carry one (the £15 catalogue): breakfast to 12:00, lunch 11:00–16:00, snack 15:30–17:30, dinner from 17:00. Dishes without it always show. */
 const MEAL_WIN={breakfast:[0,720],lunch:[660,960],snack:[930,1050],dinner:[1020,1440]};
@@ -1177,7 +1240,7 @@ function rank(noMeal){
     if(keep.length){placeIds=new Set(keep.map(h=>h.p.id));leftQ=srchParse(state.q).rest.filter(w=>w!=="refectory"&&!hits.some(h=>h.d.words.has(w))).join(" ");}}
   for(const p of allPlaces()){
     if(placeIds&&!placeIds.has(p.id))continue;
-    let offers=p.offers.filter(o=>(state.q||state.cats.has(o.cat)||o.cat==="free")&&(!o.uniOnly||p.uni===state.uni)&&(o.cat==="free"||foodOk(o))&&(state.q||typeof subOk!=="function"||subOk(o,p))); // a wish searches every category; free food is always in
+    let offers=p.offers.filter(o=>(RANK_ONLY?o.cat===RANK_ONLY:(state.q||state.cats.has(o.cat)||o.cat==="free"))&&(!o.uniOnly||p.uni===state.uni)&&(o.cat==="free"||foodOk(o))&&(state.q||typeof subOk!=="function"||subOk(o,p))); // a wish searches every category; free food is always in
     offers=offers.filter(o=>typeof o.price==="number"||o.cat==="deal"&&p.deal).filter(o=>!o.untilDate||t.dateISO<=o.untilDate).filter(o=>!o.days||o.days.includes(DAYK[t.day])); // dated offers stop after their date
     if(!state.q&&!noMeal){const k=offers.filter(o=>mealNow(o,t.minutes));dropped+=offers.length-k.length;offers=k;} // "Something specific" ignores the time of day
     offers=offers.filter(o=>!o.until||t.minutes<hm(o.until)).filter(o=>!o.from||t.minutes>=hm(o.from)).filter(o=>!o.needs||state.cards.has(o.needs));
@@ -1665,7 +1728,7 @@ function interpretWish(text,today){
   if(typeof VENUES!=="undefined"){const w=/ (?:near|in|at|by) ([a-z' ]+?) /.exec(t+" ");for(const v of VENUES){const n=v.name.toLowerCase().replace(/[’]/g,"'").split(/[,/(]/)[0].trim();if(n.length>3&&t.includes(" "+n.split(" ")[0]+" ")&&(!w||w[1].startsWith(n.split(" ")[0]))&&/(near|at|in|by) /.test(t)){out.where={lat:v.lat,lon:v.lon,label:v.name};break;}}}
   // intents: the longest phrase first
   const hits=[];for(const [p,k] of L.P){const pd=" "+p+" ";let i=t.indexOf(pd);if(i<0){const td=deacc(t);i=td.indexOf(" "+deacc(p)+" ");if(i<0)continue;}hits.push([p,k]);t=t.slice(0,i)+" "+"_".repeat(Math.max(1,p.length-1))+" "+t.slice(i+pd.length);}
-  const keys=hits.map(h=>h[1]);
+  const keys=hits.map(h=>h[1]);out.phrases=hits.map(h=>h[0]);
   for(const k of keys){if(k.startsWith("diet:")){const d={veg:"veg",vegan:"vegan",gf:"gf",halal:"halal",df:"df",nuts:"nuts"}[k.slice(5)];if(d&&!out.diet.includes(d))out.diet.push(d);}}
   const qk=keys.find(k=>k.startsWith("q:"));if(qk){out.q=qk.slice(2);out.intent=qk;}
   const real=keys.filter(k=>INTENT_MAP[k]);
@@ -1682,6 +1745,23 @@ function interpretWish(text,today){
   if(!out.understood)out.clean=out.left;
   out.say=wishSay(out);
   return out;}
+/* Several things in one sentence: "coffee and a doughnut", "pizza, chips plus a cookie", "un café y un donut". Every part it understands is marked.
+   "sandwich + crisps + drink" is a meal deal. Never "or" or "and" modes: the results show the places with all of them first. */
+const MULTI_SPLIT=/\s*(?:,|\+|&)\s*|\s+(?:and|with|plus|or|y|con|o|n)\s+/i;
+function interpretMulti(text,today){const w=interpretWish(text,today);const t=wNorm(text);
+  if(/ meal deal /.test(t)||(/ (sandwich|sarnie|butty|baguette|wrap) /.test(t)&&/ crisps? /.test(t)&&/ (drink|juice|coke|water|pop|smoothie) /.test(t))){
+    Object.assign(w,{cats:["deal"],sub:"",subs:[],drinks:false,dsub:"",q:"",left:"",understood:true,say:"Sandwich, crisps, drink. That’s a meal deal."});return w;}
+  if((w.phrases||[]).some(p=>MULTI_SPLIT.test(" "+p+" ")))return w; // "fish and chips" is one dish
+  const parts=String(text||"").split(MULTI_SPLIT).map(x=>x.trim()).filter(Boolean);if(parts.length<2)return w;
+  const got=[];let drink=false;
+  const SOFT=/\b(coke|cola|pepsi|sprite|fanta|oasis|lemonade|juice|water|soft drinks?|irn bru|tango|7.?up|fizzy|lucozade|j2o|ribena|refresco|zumo)\b/i;
+  for(const part of parts){if(SOFT.test(part)||/^(a |an |some )?(drink|bebida)$/i.test(part.trim())){if(!got.some(g=>g.k==="snack.softdrink"))got.push({k:"snack.softdrink",cats:["snack"],sub:"softdrink"});continue;} // "a coke" with food: a soft drink, not the pub
+    const pw=interpretWish(part,today);if(pw.drinks){drink=true;continue;}if(!pw.cats.length||pw.cats[0]==="free")continue;
+    const k=pw.cats.join("+")+"."+pw.sub;if(!got.some(g=>g.k===k))got.push({k,cats:pw.cats,sub:pw.sub});}
+  if(got.length<2||drink||got.every(g=>g.sub==="softdrink"))return w;if(got.length>5)got.length=5; // five's the limit
+  const cats=[];for(const g of got)for(const c of g.cats)if(!cats.includes(c))cats.push(c);
+  Object.assign(w,{cats,sub:"",subs:got.filter(g=>g.sub).map(g=>({cat:g.cats[0],id:g.sub})),drinks:false,dsub:"",q:"",left:"",understood:true,say:""});
+  return w;}
 /* Claude's answer (mode "wish") in the interpreter's shape; null when it is not about food or drink */
 const WISH_SUBS={hot:["chicken","pizza","burger","soup","jacket","wrap","noodles","breakfast"],coffee:["coffee","tea","hotchoc","matcha","chai","iced"],snack:["fries","fruit","sandwich","salad","croissant"],sweet:["brownie","cookie","doughnut","chocolate","icecream"],deal:["supermarket","lunchdeal","breakfastdeal"],drinks:["beer","cider","wine","mocktail"]};
 function wishFromClaude(j,raw){if(!j)return null;const cat=["hot","deal","coffee","snack","sweet","free","drinks"].includes(j.cat)?j.cat:null;const q=typeof j.q==="string"?j.q.slice(0,40):"";if(!cat&&!q)return null;
@@ -1698,7 +1778,7 @@ function wishSay(o){if(o.drinks)return o.dsub==="mocktail"?"Alcohol-free it is."
   if(o.q)return "Let me sniff out "+o.q+".";return "";}
 
 /* ---------- STATE ---------- */
-const state={step:0,intro:0,uni:"ucl",where:null,cats:new Set(),q:"",budget:5,mins:30,dayOff:0,minute:null,cards:new Set(["unidays"]),diet:new Set(),note:"",name:"",added:[],setupDone:false,crumbs:0};
+const state={step:0,intro:0,uni:"ucl",where:null,cats:new Set(),subs:[],q:"",budget:5,mins:30,dayOff:0,minute:null,cards:new Set(["unidays"]),diet:new Set(),note:"",name:"",added:[],setupDone:false,crumbs:0};
 try{const s=JSON.parse(localStorage.getItem("fiver.v7")||localStorage.getItem("fiver.v6")||localStorage.getItem("fiver.v5")||localStorage.getItem("fiver.v4")||"{}");
   if(s.cards)state.cards=new Set(s.cards); if(s.cats)state.cats=new Set(s.cats); if(s.diet)state.diet=new Set(s.diet);
   if(typeof s.budget==="number")state.budget=s.budget; if(typeof s.mins==="number")state.mins=Math.min(45,s.mins); if(s.seenResults)state.seenResults=true;
@@ -1887,7 +1967,7 @@ function dots(){
   ratPos=cur;
 }
 function go(n){state.step=n;render();window.scrollTo({top:0,behavior:"smooth"});}
-function render(){if(SAY.rec&&state.step!==S.results)stopSay();dots();const f=[vHello,vWhere,vResults][state.step];view.innerHTML="";view.appendChild(f());msRender(view);paintInstall();stageEnter();if(state.step===S.results)loadShared();}
+function render(){if(SAY.rec&&state.step!==S.results)stopSay();dots();const f=[vHello,vWhere,vResults][state.step];view.innerHTML="";view.appendChild(f());if(state.step===S.results){paintWalkBack();paintSnapTip();maybeTour();}msRender(view);paintInstall();stageEnter();if(state.step===S.results)loadShared();}
 function startAgain(soft){ // the logo: like opening the app again. The search goes back to the defaults; name, uni, cards and diet stay; the URL (demo mode) stays.
   document.getElementById("sheetHost").innerHTML="";
   state.q="";state.cats=new Set();state.drinks=false;state.budget=5;state.mins=30;state.minute=null;state.dayOff=0;UI.spec=false;UI.later=false;UI.bOther=false;UI.mOther=false;UI.view="list";UI.lastFkey="";
@@ -2106,8 +2186,8 @@ function pickCard(x,t,o){o=o||{};
     (dietLine(x.of)?'<p class="diet">'+esc(dietLine(x.of))+'</p>':'')+
     (x.of.checkGo?'<p class="meta">Check before you go.</p>':x.of.check?'<p class="meta">Check at the till.</p>':'')+
     (UNCHECKED.has(x.of.status)?'<button type="button" class="linkbtn teach" data-teach="'+esc(x.p.id)+'">Price not checked. Snap the menu →</button>':'')+
-    (o.compact?'<div class="actions"><a class="arrbtn big" href="'+gmaps(x.p)+'" target="_blank" rel="noopener"><span class="ms" data-ms="Walk there" style="--ms:11px"></span>'+AR+'</a><button type="button" class="chip" data-open="'+esc(x.p.id)+'">Details</button></div>':
-      '<div class="actions"><a class="chip" href="'+gmaps(x.p)+'" target="_blank" rel="noopener">'+PIN+' Walk there</a><button type="button" class="chip" id="open0">Details</button><button type="button" class="chip" id="ask" hidden>Why?</button></div><p class="meta" id="askHint"></p><div class="ai" id="aiOut" hidden></div>')+'</div>';
+    (o.compact?'<div class="actions"><a class="arrbtn big" data-walk="'+esc(x.p.id)+'" href="'+gmaps(x.p)+'" target="_blank" rel="noopener"><span class="ms" data-ms="Walk there" style="--ms:11px"></span>'+AR+'</a><button type="button" class="chip" data-open="'+esc(x.p.id)+'">Details</button></div>':
+      '<div class="actions"><a class="chip" data-walk="'+esc(x.p.id)+'" href="'+gmaps(x.p)+'" target="_blank" rel="noopener">'+PIN+' Walk there</a><button type="button" class="chip" id="open0">Details</button><button type="button" class="chip" id="ask" hidden>Why?</button></div><p class="meta" id="askHint"></p><div class="ai" id="aiOut" hidden></div>')+'</div>';
 }
 function viewsRow(){return '<div class="views"><button type="button" class="'+(UI.view!=="map"?"on":"")+'" data-view="list">List</button><span>·</span><button type="button" class="'+(UI.view==="map"?"on":"")+'" data-view="map">Map</button></div>';}
 const PICK_RAT={free:"ticket",deal:"bag",coffee:"a_coffee",sweet:"a_icecream",snack:"a_croissant",hot:"pizza"};
@@ -2118,7 +2198,7 @@ function placeShort(){const l=(state.where||VENUES[0]).label||"";return l.split(
 function fitText(r){const n=r.fit.length;return (n?n+" place"+(n>1?"s":"")+" fit":"Nothing fits yet")+" · "+money(state.budget).replace(".00","")+" · "+state.mins+" min walk"+(state.q?" · “"+state.q+"”":"");}
 function moneyNote(b){return b<=2?"Coffee money.":b<5?"Under a fiver. The brief.":b===5?"A fiver, exactly.":b<=8?"A fiver and a bit.":b<=12?"Treat day.":"Big spender.";}
 function walkNote(m){return m<=5?"Round the corner.":m<=10?"A short stroll.":m<=15?"A proper walk. Worth it.":m<=30?"Half an hour each way.":"That’s a hike. Pack a snack.";}
-function filterKey(){return [state.budget,state.mins,[...state.cats].join(","),state.q,state.dayOff||0,state.minute,(state.where||{}).label,[...state.diet].join(",")].join("|");}
+function filterKey(){return [state.budget,state.mins,[...state.cats].join(","),(state.subs||[]).map(x=>x.cat+"."+x.id).join(","),state.q,state.dayOff||0,state.minute,(state.where||{}).label,[...state.diet].join(",")].join("|");}
 function laterHTML(){
   const n=nowParts();const t=selectedTime();
   // seven days from today (London date on the phone): Today · Tomorrow · then the day names; hours and offers follow the day you pick
@@ -2141,18 +2221,92 @@ const SUBS={
   deal:[["supermarket","sub_supermarket","Supermarket deal",null],["lunchdeal","sub_lunchdeal","Lunch deal",/lunch|meal deal|main \+|combo|box|set/i],["breakfastdeal","sub_breakfastdeal","Breakfast deal",/breakfast|morning|early bird/i]],
   drinks:[["beer","sub_pint","Pint"],["cider","sub_cider","Cider"],["wine","sub_wine","Wine"],["mocktail","sub_alcfree","Alcohol-free"]]};
 const SUPERMARKET_RX=/tesco|sainsbury|co-?op|boots|m&s|marks|waitrose|lidl|aldi|spar|budgens|morrisons/i;
-function subOk(o,p){const sub=state.sub;if(!sub||sub.cat!==o.cat||sub.id==="other")return true;const def=(SUBS[sub.cat]||[]).find(x=>x[0]===sub.id);if(!def)return true;
+/* Several sub-options at once, also from different categories (state.subs = [{cat,id}]). "Other" marks the box, never filters. Up to 5. */
+const MAX_COMBO=5;
+// things you can only say, not tap: "burger, fries and a coke"
+const HIDDEN_SUBS={snack:[["softdrink",null,"Soft drink",/\b(coke|cola|pepsi|sprite|fanta|oasis|lemonade|juice|water|soft drink|irn bru|tango|7.?up|fizzy|lucozade|j2o|ribena)\b/i,/milkshake|coconut/i]]};
+function subDef(s){return (SUBS[s.cat]||[]).concat(HIDDEN_SUBS[s.cat]||[]).find(x=>x[0]===s.id);}
+function subsOf(c){return (state.subs||[]).filter(s=>s.cat===c);}
+function subOn(c,id){return (state.subs||[]).some(s=>s.cat===c&&s.id===id);}
+function subToggle(c,id){const had=subOn(c,id);
+  if(!had&&id!=="other"&&(state.subs||[]).filter(s=>s.id!=="other").length>=MAX_COMBO){UI.say="Five’s my limit. I’m a small rat.";UI.sayPose="s_shrug";return false;}
+  state.subs=(state.subs||[]).filter(s=>!(s.cat===c&&s.id===id));if(!had)state.subs.push({cat:c,id});return !had;}
+function realSubs(){return (state.subs||[]).filter(s=>s.id!=="other"&&s.cat!=="drinks"&&state.cats.has(s.cat)&&!!subDef(s));}
+function subMatch(sub,o,p){const def=subDef(sub);if(!def)return true;
   if(sub.id==="supermarket")return !!p.deal||SUPERMARKET_RX.test(p.name);
   if(sub.id==="lunchdeal"&&(p.deal||SUPERMARKET_RX.test(p.name)||/breakfast|morning|early bird/i.test(o.item)))return false;
   const t=o.item||"";return def[3].test(t)&&!(def[4]&&def[4].test(t));}
+function subOk(o,p){const L=subsOf(o.cat).filter(s=>s.id!=="other");if(!L.length)return true;return L.some(s=>subMatch(s,o,p));}
+function subLabel(s){const d=subDef(s);return d?d[2]:s.id==="other"?"Other":s.id;}
 function subCat(){const c=UI.lastCat;if(c==="drinks")return state.drinks?"drinks":null;if(c&&state.cats.has(c)&&!state.drinks)return c;if(state.drinks)return "drinks";return [...state.cats].find(x=>SUBS[x])||null;}
-function subsHTML(){const c=subCat();if(!c||state.q||!SUBS[c])return "";const cur=c==="drinks"?state.dsub:(state.sub&&state.sub.cat===c?state.sub.id:"");
-  return '<div class="subs" id="subChips">'+SUBS[c].map(x=>'<button type="button" class="sub-tile'+(cur===x[0]?" on":"")+'" data-sub="'+x[0]+'" data-cat="'+c+'" aria-pressed="'+(cur===x[0])+'">'+(SUBICO[x[1]]?'<img src="'+SUBICO[x[1]]+'" alt="">':'')+'<span>'+esc(x[2])+'</span></button>').join("")+'<button type="button" class="sub-tile other'+(cur==="other"?" on":"")+'" id="subOther" data-sub="other" data-cat="'+c+'" aria-pressed="'+(cur==="other")+'"><span class="ms wine" data-ms="Other" style="--ms:17px"></span><span class="olbl">Other</span></button></div>';}
-function subName(){const c=state.drinks?"drinks":state.sub&&state.sub.cat;const id=state.drinks?state.dsub:state.sub&&state.sub.id;if(id==="other")return "Other";const def=c&&(SUBS[c]||[]).find(x=>x[0]===id);return def?def[2]:"";}
+// the ticked categories in the order they were ticked
+function catsInOrder(){const o=(state.catOrder||[]).filter(c=>state.cats.has(c));for(const c of CATS.map(x=>x.id))if(state.cats.has(c)&&!o.includes(c))o.push(c);return o;}
+function subsHTML(){if(state.q)return "";
+  const tile=(c,x,on)=>'<button type="button" class="sub-tile'+(on?" on":"")+'" data-sub="'+x[0]+'" data-cat="'+c+'" aria-pressed="'+on+'">'+(SUBICO[x[1]]?'<img src="'+SUBICO[x[1]]+'" alt="">':'')+'<span>'+esc(x[2])+'</span></button>';
+  const other=(c,on)=>'<button type="button" class="sub-tile other'+(on?" on":"")+'" id="subOther" data-sub="other" data-cat="'+c+'" aria-pressed="'+on+'"><span class="ms wine" data-ms="Other" style="--ms:17px"></span><span class="olbl">Other</span></button>';
+  if(state.drinks){const c="drinks";return '<div class="subs" id="subChips">'+SUBS[c].map(x=>tile(c,x,state.dsub===x[0])).join("")+other(c,state.dsub==="other")+'</div>';}
+  const groups=catsInOrder().filter(c=>SUBS[c]);if(!groups.length)return "";
+  const multi=groups.length>1;const last=groups[groups.length-1];
+  // more than one food type: every group in one sliding row, a small grey label and a thin line before each; "Other" once at the end
+  return '<div class="subs'+(multi?" multi":"")+'" id="subChips">'+groups.map((c,i)=>(multi?(i?'<i class="subsep" aria-hidden="true"></i>':'')+'<span class="subgrp">'+esc((CATS.find(x=>x.id===c)||{}).name||c)+'</span>':'')+SUBS[c].map(x=>tile(c,x,subOn(c,x[0]))).join("")).join("")+other(last,groups.some(c=>subOn(c,"other")))+'</div>';}
+function subName(){if(state.drinks){const id=state.dsub;if(id==="other")return "Other";const def=(SUBS.drinks||[]).find(x=>x[0]===id);return def?def[2]:"";}
+  const L=(state.subs||[]).filter(s=>s.cat==="drinks"?false:state.cats.has(s.cat));return L.map(subLabel).join(" + ");}
+/* Several things at once (2 to 5). Per place: the cheapest of each thing, your cards applied; a meal or meal deal when it covers several and costs less.
+   Places with ALL of them first, by total; none? the ones with the most, then by total. The rest: "Or just one:". Never an empty screen. */
+const DEAL_ROLE={"snack.sandwich":"main","snack.salad":"main","hot.wrap":"main","snack.fruit":"side","snack.fries":"side","sweet.chocolate":"side","sweet.cookie":"side","sweet.brownie":"side","snack.softdrink":"drink","coffee.coffee":"drink"};
+function mealCover(p,of,subs){const t=of.item||"";if(of.cat!=="deal"&&!/\bmeal\b/i.test(t))return [];
+  if(p.deal&&/meal deal|lunch deal|main \+ snack \+ drink/i.test(t)&&!/premium/i.test(t)){const used=new Set(),out=[];subs.forEach((s,i)=>{const r=DEAL_ROLE[s.cat+"."+s.id];if(r&&!used.has(r)){used.add(r);out.push(i);}});return used.has("main")?out:[];} // a meal deal needs a main
+  const out=[];subs.forEach((s,i)=>{const d=subDef(s);if(d&&d[3]&&(d[3].test(t)||(s.id==="softdrink"&&/\bdrinks?\b/i.test(t))))out.push(i);});return out;}
+function offerLive(o,t){return (!o.untilDate||t.dateISO<=o.untilDate)&&(!o.days||o.days.includes(DAYK[t.day]))&&(!o.until||t.minutes<hm(o.until))&&(!o.from||t.minutes>=hm(o.from))&&(!o.needs||state.cards.has(o.needs));}
+function comboRank(){
+  const subs=realSubs().slice(0,MAX_COMBO);if(subs.length<2||state.q||state.drinks)return null;
+  const keepS=state.subs,keepC=state.cats;const per=[];
+  try{for(const s of subs){state.subs=[s];state.cats=new Set([s.cat]);RANK_ONLY=s.cat;const r=rank();const m=new Map();
+      for(const x of r.fit.concat(r.rest)){if(!x.o.open||x.walk>state.mins||x.o.closesIn<=x.walk||x.of.cat!==s.cat)continue;const pv=m.get(x.p.id);if(!pv||x.pr.price<pv.pr.price)m.set(x.p.id,x);}
+      per.push(m);}}
+  finally{state.subs=keepS;state.cats=keepC;RANK_ONLY=null;}
+  const t=selectedTime(),here=state.where||VENUES[0],n=subs.length,list=[];
+  for(const p of allPlaces()){
+    const rows=subs.map((s,i)=>per[i].get(p.id)||null);const any=rows.find(Boolean);
+    const hasMeal=p.offers.some(o=>(o.cat==="deal"||/\bmeal\b/i.test(o.item||""))&&(typeof o.price==="number"||p.deal));if(!any&&!hasMeal)continue;
+    let o,walk;if(any){o=any.o;walk=any.walk;}else{o=isOpen(p,t);walk=Math.max(1,Math.round(metres(here,p)/80));if(!o.open||walk>state.mins||o.closesIn<=walk)continue;}
+    const sumOf=idx=>Math.round(idx.reduce((a,i)=>a+rows[i].pr.price,0)*100)/100;
+    const own=rows.map((x,i)=>x?i:-1).filter(i=>i>=0);
+    let best={has:own,total:sumOf(own),meal:null},alt=null;
+    for(const of of p.offers){if(!offerLive(of,t)||!(typeof of.price==="number"||of.cat==="deal"&&p.deal))continue;const cov=mealCover(p,of,subs);if(cov.length<2)continue;
+      const bp=bestPrice(p,of,t);const rest=own.filter(i=>!cov.includes(i));const has=[...new Set(cov.concat(rest))].sort();const total=Math.round((bp.price+sumOf(rest))*100)/100;
+      const instead=cov.every(i=>rows[i])?sumOf(own):null;
+      if(has.length>best.has.length||(has.length===best.has.length&&total<best.total-1e-9))best={has,total,meal:{of,pr:bp,cov,instead}};else if(!alt||bp.price<alt.pr.price)alt={of,pr:bp};}
+    if(best.has.length<1)continue;
+    list.push({p,o,walk,t,rows,subs,n,has:best.has,total:best.total,meal:best.meal,alt:best.meal?null:alt,fits:best.total<=state.budget+1e-9,rating:p.rating||0});}
+  const byTotal=(a,b)=>(b.fits-a.fits)||a.total-b.total||(b.rating-a.rating)||a.walk-b.walk;
+  const dedupe=L=>{const seen=new Set(),out=[];for(const c of L){if(seen.has(c.p.name))continue;seen.add(c.p.name);out.push(c);if(out.length>=5)break;}return out;};
+  const full=list.filter(c=>c.has.length===n).sort(byTotal);
+  const part=n>=3?list.filter(c=>c.has.length>=2&&c.has.length<n).sort((a,b)=>b.has.length-a.has.length||byTotal(a,b)):[];
+  const combos=dedupe(full.length?full:part);
+  const singles=subs.map((s,i)=>{const L=[...per[i].values()].filter(x=>x.pr.price<=state.budget+1e-9).sort((a,b)=>a.pr.price-b.pr.price||a.walk-b.walk);return {s,row:L[0]||null};});
+  return {subs,n,combos,full:full.length>0,singles};}
+function forN(n){return n===2?"for both":"for all "+n;}
+function itemsLine(c){return c.has.filter(i=>!(c.meal&&c.meal.cov.includes(i))).map(i=>{const x=c.rows[i];return subLabel(c.subs[i])+" "+money(x.pr.price)+(x.saved>0&&x.pr.label?" "+x.pr.label.split(" (")[0]:"");}).join(" · ");}
+function comboCard(c,t,i){const n=c.n,k=c.has.length,missing=c.subs.map((s,j)=>c.has.includes(j)?null:subLabel(s).toLowerCase()).filter(Boolean);
+  const first=c.rows.find(Boolean);
+  const detail=c.subs.map((s,j)=>{const opts=c.p.offers.filter(o=>o.cat===s.cat&&subMatch(s,o,c.p)&&typeof o.price==="number"&&offerLive(o,t)&&foodOk(o)).map(o=>({o,pr:bestPrice(c.p,o,t)})).sort((a,b)=>a.pr.price-b.pr.price).slice(0,4);
+      return '<div class="cgrp"><div class="k">'+esc(subLabel(s))+'</div>'+(opts.length?opts.map(x=>'<p class="meta">'+money(x.pr.price)+' · '+esc(x.o.item)+(x.pr.label?' · '+esc(x.pr.label.split(" (")[0]):'')+'</p>').join(""):'<p class="meta">'+(c.meal&&c.meal.cov.includes(j)?'In the meal':'Not here')+'</p>')+'</div>';}).join("")+
+    (c.alt?'<div class="cgrp"><div class="k">As a meal</div><p class="meta">'+money(c.alt.pr.price)+' · '+esc(c.alt.of.item)+'. Separately is cheaper.</p></div>':'')+(c.meal?'<div class="cgrp"><div class="k">The meal</div><p class="meta">'+money(c.meal.pr.price)+' · '+esc(c.meal.of.item)+(c.meal.pr.label?' · '+esc(c.meal.pr.label.split(" (")[0]):'')+'</p></div>':'');
+  return '<div class="ccard'+(c.fits?"":" over")+'" data-ci="'+i+'"><button type="button" class="chead" aria-expanded="false"><span class="ctop"><span class="cname">'+esc(c.p.name)+'</span><span class="cwalk">'+c.walk+' min</span></span>'+
+    (k<n?'<span class="chas">Has '+k+' of '+n+' · no '+esc(missing.join(", no "))+'</span>':'')+
+    '<span class="ctot"><span class="ms wine" data-ms="'+money(c.total)+'" style="--ms:'+(i?28:36)+'px"></span><span class="cfor">'+(k<n?"for "+(k===2?"those 2":"those "+k):forN(n))+'</span></span>'+
+    (c.meal?'<span class="cmeal">'+money(c.meal.pr.price)+' as a meal'+(c.meal.instead!=null&&c.meal.instead>c.meal.pr.price?' (instead of '+money(c.meal.instead)+')':'')+'</span>':'')+
+    (itemsLine(c)?'<span class="citems">'+esc(itemsLine(c))+'</span>':'')+(c.fits?'':'<span class="cover">Over your '+money(state.budget).replace(".00","")+'</span>')+'</button>'+
+    '<div class="cdetail" hidden>'+detail+'<p class="meta"><b>'+esc(first?statusLine(first,t):hoursLabel(c.o,t))+'</b></p><div class="actions"><a class="chip" data-walk="'+esc(c.p.id)+'" href="'+gmaps(c.p)+'" target="_blank" rel="noopener">'+PIN+' Walk there</a>'+(first?'<button type="button" class="chip" data-combo="'+i+'">Details</button>':'')+'</div></div></div>';}
+function comboHTML(cr,t){
+  const one=cr.singles.filter(x=>x.row);
+  return (cr.combos.length?'<div class="k" style="margin-top:6px">'+(cr.full?(cr.n===2?"Both in one place":"All "+cr.n+" in one place"):"The most in one place")+'</div>':'')+cr.combos.map((c,i)=>comboCard(c,t,i)).join("")+
+    (one.length?'<div class="k" style="margin-top:12px">Or just one:</div><div class="list" id="justOne">'+one.map((x,i)=>'<button type="button" class="item citem" data-ci="'+i+'"><span class="ms wine" data-ms="'+money(x.row.pr.price)+'" style="--ms:14px;min-width:64px"></span><div style="min-width:0"><h3>'+esc(subLabel(x.s))+' · '+esc(x.row.p.name)+'</h3><div class="meta">'+esc(x.row.of.item)+(x.row.saved>0&&x.row.pr.label?' · '+esc(x.row.pr.label.split(" (")[0]):'')+' · '+esc(hoursLabel(x.row.o,x.row.t||t))+'</div></div><div class="walk">'+x.row.walk+' min<small>walk</small></div></button>').join("")+'</div>':'');}
 /* Search: a magnifier tile stuck to the left of the category row; tapping it opens a rounded box under the row */
 /* Apply what the interpreter understood: category and sub-option, budget, walk, day and time, diet, place; the rat confirms in one line */
 function applyWish(w){
-  const go=()=>{state.q="";if(w.drinks){state.drinks=true;state.dsub=w.dsub||"";UI.lastCat="drinks";}else{state.drinks=false;state.cats=new Set(w.cats.length?w.cats:[...state.cats]);state.sub=w.sub&&w.cats[0]?{cat:w.cats[0],id:w.sub}:null;if(w.cats[0])UI.lastCat=w.cats[0];}
+  const go=()=>{state.q="";if(w.drinks){state.drinks=true;state.dsub=w.dsub||"";UI.lastCat="drinks";}else{state.drinks=false;state.cats=new Set(w.cats.length?w.cats:[...state.cats]);state.catOrder=w.cats.slice();state.subs=w.subs&&w.subs.length?w.subs.slice():w.sub&&w.cats[0]?[{cat:w.cats[0],id:w.sub}]:[];if(w.cats[0])UI.lastCat=w.cats[0];}
     if(w.budget!==null)state.budget=Math.max(1,Math.min(MAX_BUDGET,w.budget));if(w.mins!==null)state.mins=Math.max(5,Math.min(MAX_WALK,w.mins));
     if(w.dayOffset!==null)state.dayOff=Math.max(0,Math.min(6,w.dayOffset));if(w.minute!==null){state.minute=w.minute;UI.later=true;}
     for(const d of w.diet)state.diet.add(d);if(w.where)state.where=w.where;
@@ -2184,16 +2338,16 @@ function filtersHTML(){
 }
 function wireFilters(d){
   const q=sel=>d.querySelector(sel);
-  q("#catChips").addEventListener("click",e=>{const b=e.target.closest(".cat-tile");if(!b||b.id==="searchTile")return;const id=b.dataset.id;UI.lastCat=id;if(id==="drinks"){toggleDrinks();return;}state.drinks=false;if(state.cats.has(id)){state.cats.delete(id);if(state.sub&&state.sub.cat===id)state.sub=null;}else state.cats.add(id);persist();UI.catScroll=q("#catChips").scrollLeft;render();});
+  q("#catChips").addEventListener("click",e=>{const b=e.target.closest(".cat-tile");if(!b||b.id==="searchTile")return;const id=b.dataset.id;UI.lastCat=id;if(id==="drinks"){toggleDrinks();return;}state.drinks=false;try{localStorage.setItem("fiver.tapped","1");}catch(e){}state.catOrder=(state.catOrder||[]).filter(c=>c!==id);if(state.cats.has(id)){state.cats.delete(id);state.subs=(state.subs||[]).filter(s=>s.cat!==id);}else{state.cats.add(id);state.catOrder.push(id);}persist();UI.catScroll=q("#catChips").scrollLeft;render();});
   q("#searchTile").onclick=()=>{const i=q("#qIn");if(searchOn()&&!(i&&i.value.trim())&&!state.q){stopSay();UI.searchOpen=false;render();return;}UI.searchOpen=true;UI.focusQ=true;render();};
   {const i=q("#qIn");if(i){if(UI.focusQ){UI.focusQ=false;setTimeout(()=>{try{i.focus();}catch(e){}},0);}
     // the buttons inside the box keep the focus (iPhone counts a tap on them as a blur); the box closes only on a tap outside it (sayOutside)
     d.querySelectorAll("#specBox button").forEach(b=>b.addEventListener("pointerdown",e=>e.preventDefault()));}}
-  if(q("#catClear"))q("#catClear").onclick=()=>{state.cats=new Set();state.drinks=false;state.sub=null;state.dsub="";persist();render();};
+  if(q("#catClear"))q("#catClear").onclick=()=>{state.cats=new Set();state.drinks=false;state.subs=[];state.dsub="";persist();render();};
   if(q("#subChips"))q("#subChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
     const c=b.dataset.cat,id=b.dataset.sub;
-    if(id==="other"){const was=c==="drinks"?state.dsub==="other":!!(state.sub&&state.sub.cat===c&&state.sub.id==="other");
-      if(c==="drinks")state.dsub=was?"":"other";else state.sub=was?null:{cat:c,id:"other"};UI.searchOpen=!was||!!state.q;UI.focusQ=!was;UI.subScroll=q("#subChips").scrollLeft;render();return;}if(c==="drinks"){state.dsub=state.dsub===id?"":id;}else{state.sub=state.sub&&state.sub.cat===c&&state.sub.id===id?null:{cat:c,id};}
+    if(id==="other"){const was=c==="drinks"?state.dsub==="other":subOn(c,"other");
+      if(c==="drinks")state.dsub=was?"":"other";else subToggle(c,"other");UI.searchOpen=!was||!!state.q;UI.focusQ=!was;UI.subScroll=q("#subChips").scrollLeft;render();return;}if(c==="drinks"){state.dsub=state.dsub===id?"":id;}else{subToggle(c,id);}
     UI.subScroll=q("#subChips").scrollLeft;render();});
   q("#howChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
     if(b.dataset.b){state.budget=Number(b.dataset.b);UI.bOther=false;persist();render();}
@@ -2222,7 +2376,7 @@ function wireFilters(d){
   wireSay(d,qIn,s=>apply(s));
   const apply=async(said)=>{let text=(typeof said==="string"?said:qIn.value).trim();
     // 0 · the sentence first: "I would like to have a coffee" → Hot drinks · Coffee, "pizza under 4 quid" → Pizza, £4
-    if(text){const wsh=interpretWish(text,nowParts().day);
+    if(text){const wsh=interpretMulti(text,nowParts().day);
       if(wsh.understood&&(wsh.cats.length||wsh.drinks||wsh.budget!==null||wsh.mins!==null||wsh.diet.length)){applyWish(wsh);return;}
       if(!wsh.understood&&typeof readWishRemote==="function"&&ON_SITE){const cw=wishFromClaude(await readWishRemote(text),text); // nothing understood here: Claude has 3 s, else the normal search
         if(cw&&(cw.cats.length||cw.drinks)){applyWish(cw);return;}if(cw&&cw.q){qIn.value=text=cw.q;}else if(wsh.clean)qIn.value=text=wsh.clean;}
@@ -2250,7 +2404,15 @@ function vResults(){
   try{localStorage.setItem("fiver.lastSeen",String(Date.now()));}catch(e){}
   const ctx=[r.fit[0]?r.fit[0].p.id+"|"+r.fit[0].of.item:"none",fkey,state.uni].join("|");
   const fewH=()=>{const fm=moment("few",ctx);return '<button type="button" class="linkbtn fewline" id="farTeach">'+esc(fm.line)+'</button>';};
-  if(r.fit.length){const x=r.fit[0];
+  const cr=UI.view!=="map"?comboRank():null;const combo=!!(cr&&(cr.combos.length||cr.over||cr.singles.some(x=>x.row)));
+  const freeTop=combo&&r.fit[0]&&r.fit[0].of.cat==="free"?r.fit[0]:null; // free food (the hackathon pizza) still comes first
+  if(combo){const lbl=cr.subs.map(subLabel).join(" + ");UI.back=false;UI.lineKey="combo";const c0=cr.combos[0];
+    if(c0&&cr.full&&c0.fits){line=(cr.n===2?lbl+", one stop: ":"All "+cr.n+" at "+c0.p.name+": ")+money(c0.total)+(cr.n===2?" at "+c0.p.name:"")+".";pose="point";}
+    else if(c0&&cr.full){line="Nowhere has all of that under "+money(state.budget).replace(".00","")+". "+c0.p.name+" comes closest.";pose="s_shrug";}
+    else if(c0){line="Nowhere near has all "+cr.n+". "+c0.p.name+" has "+c0.has.length+".";pose="s_shrug";}
+    else{line="Nowhere has all of that nearby. Here’s each one on its own.";pose="s_shrug";}
+    body=filtersHTML()+viewsRow()+(freeTop?pickCard(freeTop,t,{compact:true,label:"Free food near you"}):'')+comboHTML(cr,t);actions='';}
+  else if(r.fit.length){const x=r.fit[0];
     let mk=pickMoment(x,state.q);const strong=mk==="support"||mk==="free";
     if(first&&!strong)mk="first";else if(UI.back&&!strong)mk="back";
     else if(!["support","free","late","card","found"].includes(mk))mk=overlayKey(x,ctx,t)||mk;
@@ -2297,7 +2459,7 @@ function vResults(){
     actions=bt.join("")+(r.rest.length||r.unpriced.length?'<button type="button" class="linkbtn" id="seeAll">Show the list</button>':'')+'<button type="button" class="linkbtn teach" data-teach="">Know somewhere I don’t? Teach me →</button>';}
     lastRank._unlock=u;
   }
-  if(UI.say){line=UI.say;pose=["a_pizza","cheer","f_excited","point"][hashStr(UI.say)%4];UI.say=null;}
+  if(UI.say){line=UI.say;pose=UI.sayPose||["a_pizza","cheer","f_excited","point"][hashStr(UI.say)%4];UI.say=null;UI.sayPose=null;}
   const d=stage("results-"+(r.fit[0]?r.fit[0].p.id:"none"),pose,line,body,actions,S.results);
   if(changed){const h=d.querySelector(".hero.pick");if(h)h.classList.add("pulse");const fl=d.querySelector("#fitLine");if(fl)fl.classList.add("pulse");}
   const ft=d.querySelector("#farTeach");if(ft)ft.onclick=()=>openTeach();const qt=d.querySelector("#qTeach");if(qt)qt.onclick=()=>openTeach();const fm=d.querySelector("#farMain");if(fm)fm.onclick=()=>{const m=state.uni!=="ucl"&&uniMain();const v=m||VENUES.find(x=>x.id==="quad");state.where={lat:v.lat,lon:v.lon,label:v.name};persist();render();};
@@ -2306,11 +2468,15 @@ function vResults(){
     '<div style="min-width:0"><h3>'+esc(row.p.name)+(row.saved>0?'<span class="saved">−£'+row.saved.toFixed(2)+'</span>':'')+'</h3><div class="meta">'+esc(row.of.item)+(row.of.about?' · about '+money(row.pr.price):'')+' · '+esc(hoursLabel(row.o,row.t||t))+(row.ask.length?' · <span class="diet">ask staff</span>':'')+'</div></div>'+
     '<div class="walk">'+row.walk+' min<small>walk</small>'+(row.more?'<small>+'+row.more+' more</small>':'')+'</div></button>';
   const seenB={};const fitRows=[];for(const row of r.fit){const k=row.p.name+"|"+row.of.item+"|"+row.pr.price;if(seenB[k]){seenB[k].more=(seenB[k].more||0)+1;continue;}seenB[k]=row;fitRows.push(row);}
-  const fitEl=d.querySelector("#fit");if(fitEl)fitEl.innerHTML=fitRows.map(item).join("");
+  // once per list: under the first result whose price isn't checked, the rat asks for a photo of the menu (opens Teach with that place)
+  let asked=false;const askCard=p=>'<button type="button" class="ratask" data-place="'+esc(p.id)+'">'+rat("a_camera",58)+'<span>I don’t know prices here yet. Snap the menu and I’ll remember it for everyone →</span></button>';
+  const askAfter=(row,unchecked)=>!asked&&unchecked?(asked=true,askCard(row.p)):"";
+  const fitEl=d.querySelector("#fit");if(fitEl)fitEl.innerHTML=fitRows.map(row=>item(row)+askAfter(row,UNCHECKED.has(row.of.status))).join("");
   const restEl=d.querySelector("#rest");if(restEl){const near=r.rest.filter(x=>x.walk<=30),reach=near.filter(x=>x.o.open),later=near.filter(x=>!x.o.open).sort((a,b)=>((a.o.next?a.o.next.k*1440+a.o.next.at:1e5)-(b.o.next?b.o.next.k*1440+b.o.next.at:1e5))||a.walk-b.walk);
     restEl.innerHTML=(reach.length?'<div class="k" style="margin-top:8px">Out of reach right now</div>'+reach.slice(0,25).map(item).join(""):'')+(later.length?'<div class="k" style="margin-top:12px">Opening later</div>'+later.slice(0,25).map(item).join(""):'')+(r.rest.length>near.length?'<p class="note">'+(r.rest.length-near.length)+' more over 30 min away.</p>':'');}
-  const unEl=d.querySelector("#unpriced");if(unEl)unEl.innerHTML=r.unpriced.slice(0,20).map(row=>'<button type="button" class="item unp" data-id="'+esc(row.p.id)+'"><span class="ms" data-ms="£?" style="--ms:14px;min-width:64px"></span><div style="min-width:0"><h3>'+esc(row.p.name)+'</h3><div class="meta">Price not checked. Snap the menu →'+(row.o.unknown?' · hours not checked':'')+'</div></div><div class="walk">'+row.walk+' min<small>walk</small></div></button>').join("");
-  d.addEventListener("click",e=>{const b=e.target.closest(".item");if(!b)return;if(b.classList.contains("unp")){const u=r.unpriced.find(x=>x.p.id===b.dataset.id);if(u)openTeach(u.p);return;}const row=r.fit.concat(r.rest).find(x=>x.p.id===b.dataset.id);if(row)openSheet(row);});
+  const unEl=d.querySelector("#unpriced");if(unEl)unEl.innerHTML=r.unpriced.slice(0,20).map(row=>'<button type="button" class="item unp" data-id="'+esc(row.p.id)+'"><span class="ms" data-ms="£?" style="--ms:14px;min-width:64px"></span><div style="min-width:0"><h3>'+esc(row.p.name)+'</h3><div class="meta">Price not checked. Snap the menu →'+(row.o.unknown?' · hours not checked':'')+'</div></div><div class="walk">'+row.walk+' min<small>walk</small></div></button>'+askAfter(row,true)).join("");
+  d.addEventListener("click",e=>{const ra=e.target.closest(".ratask");if(ra){const pl=allPlaces().find(p=>p.id===ra.dataset.place);openTeach(pl||null);return;}
+    const b=e.target.closest(".item");if(!b)return;if(b.classList.contains("citem")){const x=cr&&cr.singles.filter(y=>y.row)[Number(b.dataset.ci)];if(x)openSheet(x.row);return;}if(b.classList.contains("unp")){const u=r.unpriced.find(x=>x.p.id===b.dataset.id);if(u)openTeach(u.p);return;}const row=r.fit.concat(r.rest).find(x=>x.p.id===b.dataset.id);if(row)openSheet(row);});
   d.querySelectorAll(".views button").forEach(b=>b.onclick=()=>{UI.view=b.dataset.view;render();});
   const sa=d.querySelector("#seeAll");if(sa)sa.onclick=()=>{const box=d.querySelector("#allBox");box.hidden=false;msRender(box);sa.hidden=true;};
   if(UI.view==="map"){const priced=new Set(r.fit.slice(0,8).map(x=>x.p.id));const card=d.querySelector("#mapCard");
@@ -2320,7 +2486,9 @@ function vResults(){
       d.querySelectorAll('.pin[data-id="'+row.p.id+'"],.rpin[data-id="'+row.p.id+'"]').forEach(e=>e.classList.add("sel"));
       if(card.scrollIntoView)card.scrollIntoView({block:"nearest",behavior:"smooth"});};
     setTimeout(()=>{const m=view.querySelector("#mapbox2");if(m)mountMap(m,{pins:r.fit.concat(r.rest),priced,top:r.fit[0]?[r.fit[0].p.id]:[],pick:showRow});},0);}
-  if(r.fit.length){if(UI.view!=="map"){d.querySelector("#open0").onclick=()=>openSheet(r.fit[0]);wireAsk(d,r);if(r.cheapest)d.querySelectorAll('.hero.compact [data-open]').forEach(b=>b.onclick=()=>openSheet(r.cheapest));}}
+  if(combo){d.querySelectorAll("[data-combo]").forEach(b=>b.onclick=()=>openSheet(cr.combos[Number(b.dataset.combo)].rows.find(Boolean)));
+    d.querySelectorAll(".ccard .chead").forEach(h=>h.onclick=()=>{const det=h.parentNode.querySelector(".cdetail");const op=det.hidden;det.hidden=!op;h.setAttribute("aria-expanded",String(op));h.parentNode.classList.toggle("open",op);});if(freeTop)d.querySelectorAll('.hero.compact [data-open]').forEach(b=>b.onclick=()=>openSheet(freeTop));}
+  else if(r.fit.length){if(UI.view!=="map"){d.querySelector("#open0").onclick=()=>openSheet(r.fit[0]);wireAsk(d,r);if(r.cheapest)d.querySelectorAll('.hero.compact [data-open]').forEach(b=>b.onclick=()=>openSheet(r.cheapest));}}
   else{const u=lastRank._unlock;const q=s=>d.querySelector(s);
     if(q("#fixQ"))q("#fixQ").onclick=()=>{state.q="";UI.spec=false;persist();render();};
     if(q("#fixB"))q("#fixB").onclick=()=>{state.budget=Math.min(MAX_BUDGET,u.budget);persist();render();};
@@ -2335,13 +2503,19 @@ function vResults(){
 
 /* No food type ticked: no list. The rat naps; free food open now (or about to start) still comes first. */
 function vSleepy(){
-  const r=rank();lastRank=r;const t=r.t;const ctx=["sleepy",(state.where||{}).label,state.uni].join("|");const m=moment("sleepy",ctx);
+  const r=rank();lastRank=r;const t=r.t;const ctx=["sleepy",(state.where||{}).label,state.uni].join("|");let m=moment("sleepy",ctx);
+  const firstRun=!lsGet("fiver.tapped");if(firstRun)m={pose:"sleep",line:"Tap what you fancy. I’ll find it under a fiver."}; // first launch: nothing ticked yet
   const free=r.fit.filter(x=>x.of.cat==="free").slice(0,2);
   const soon=free.length?[]:freeSoon(t);
   const body=filtersHTML()+free.map((x,i)=>pickCard(x,t,{compact:true,label:i?"Also free near you":"Free food near you"})).join("")+soon.map(x=>'<div class="hero pick compact"><div class="k">Free food soon</div><span class="ms" data-ms="'+esc(x.p.name)+'" style="--ms:16px"></span><p class="lead">'+esc(x.of.item)+'</p><p class="meta"><b>Starts at '+fmt(x.at)+'</b> · '+x.walk+' min walk</p></div>').join("")+
     '<div class="sleepy"><button type="button" class="linkbtn" id="showAll">Or show me everything open now →</button></div>';
   const d=stage("sleepy",m.pose,m.line,body,'',S.results);
-  wireFilters(d);{const fl=d.querySelector("#fitLine");if(fl)fl.textContent="";}d.querySelector("#showAll").onclick=()=>{state.cats=new Set(CATS.map(c=>c.id));persist();render();};
+  wireFilters(d);{const fl=d.querySelector("#fitLine");if(fl)fl.textContent="";}
+  const hintOK=firstRun&&tourDone()===false&&!tourCan(); // the tour replaces the arrow; never both
+  if(hintOK&&!UI.arrowUntil)UI.arrowUntil=Date.now()+3000; // 3 s from the first time it shows, even if the screen re-draws
+  const left=UI.arrowUntil?UI.arrowUntil-Date.now():0;
+  if(hintOK&&left>200){const cc=d.querySelector("#catChips");if(cc){const a=document.createElement("div");a.className="taphint";a.setAttribute("aria-hidden","true");
+    a.innerHTML='<svg viewBox="0 0 28 40" width="26" height="38"><path d="M14 3v30M5 24l9 10 9-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';a.style.setProperty("--out",Math.max(0,left-350)+"ms");cc.parentNode.insertBefore(a,cc);setTimeout(()=>a.remove(),left);}}d.querySelector("#showAll").onclick=()=>{state.cats=new Set(CATS.map(c=>c.id));persist();render();};
   d.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const row=r.fit.find(x=>x.p.id===b.dataset.open);if(row)openSheet(row);});
   d.querySelectorAll(".teach").forEach(b=>b.onclick=()=>openTeach(b.dataset.teach?allPlaces().find(p=>p.id===b.dataset.teach):null));
   return d;}
@@ -2363,7 +2537,7 @@ function openSheet(row){
     '<p class="lead">'+esc(row.of.item)+'</p><p class="meta"><b>'+esc(statusLine(row,t))+'</b></p>'+
     '<p class="meta">'+breakdown(row)+(row.of.in?' · '+money(row.of.in)+' if you sit in':'')+'</p>'+(row.p.why?'<p class="body">'+esc(row.p.why)+'</p>':'')+
     (dl?'<p class="diet">Diet: '+esc(dl)+'. Allergens change: ask staff.</p>':'')+
-    '<div class="chips"><a class="chip" href="'+gmaps(row.p)+'" target="_blank" rel="noopener">'+PIN+' Walk there</a></div>'+
+    '<div class="chips"><a class="chip" data-walk="'+esc(row.p.id)+'" href="'+gmaps(row.p)+'" target="_blank" rel="noopener">'+PIN+' Walk there</a></div>'+
     '<div class="k" style="margin-top:10px">Your price</div><div class="prices">'+rows.map(x=>'<div class="pr'+(x.mine&&!x.promo?" mine":"")+'"><div>'+esc(x.label)+(x.mine&&x.label!=="No card"&&x.label!=="Everyone"?' · you have it':'')+(x.note?'<span class="why">'+esc(x.note)+'</span>':'')+'</div><span class="ms'+(x.mine&&!x.promo?' wine':'')+'" data-ms="'+money(x.price)+'" style="--ms:13px"></span></div>').join("")+'</div>'+
     (row.p.drinkRef&&isMeal(row.of)?'<p class="note">With a drink ≈ '+money(row.pr.price+row.p.drinkRef)+'</p>':'')+(row.p.service?'<p class="note">+ optional 12.5% service</p>':'')+
     (row.p.chain==="burgerking"&&(t.day===4||t.day===5)?'<p class="note">Today: 15% off orders of £15 or more (Thursdays and Fridays).</p>':'')+(row.of.perPerson?'<p class="note">'+money(row.of.perPerson)+' each if you share.</p>':'')+(row.of.label?'<p class="note">'+esc(row.of.label)+'</p>':'')+
@@ -2423,6 +2597,110 @@ function teachCelebrate(sheet,n,first){ // Fiver celebrates a contribution; crum
   const r=sheet.querySelector("#teachRank");if(r)r.textContent=(state.crumbs||0)+" crumbs · "+after;
   if(after!==before&&h)setTimeout(()=>{if(h.isConnected)h.innerHTML=rat("f_hearts",84)+'<p class="lead">'+esc(after)+'. The pigeons have heard of you.</p>';},2600);
 }
+/* Asking for photos at the right moment, never a window over everything */
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}}
+const VISITS=(()=>{const n=Number(lsGet("fiver.visits")||0)+1;lsSet("fiver.visits",String(n));return n;})();
+// "Walk there" tapped: back in the app within 2 hours, one line at the top asks for the board
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a[data-walk]");if(!a)return;const p=allPlaces().find(x=>x.id===a.dataset.walk);lsSet("fiver.walked",JSON.stringify({id:a.dataset.walk,name:p?p.name:"",t:Date.now()}));UI.walkBack=false;},true);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&lsGet("fiver.walked")){UI.walkBack=true;if(state.step===S.results)paintWalkBack();}});
+UI.walkBack=!!lsGet("fiver.walked");
+if(state.seenResults||state.cats.size)lsSet("fiver.tapped","1"); // not a first launch
+function walkedRecent(){try{const w=JSON.parse(lsGet("fiver.walked")||"null");if(!w||!w.t)return null;if(Date.now()-w.t>2*3600e3){lsSet("fiver.walked",null);return null;}return w;}catch(e){return null;}}
+function paintWalkBack(){const old=document.getElementById("walkBack");if(old)old.remove();const w=UI.walkBack&&walkedRecent();if(!w||!w.name||!view.firstChild)return;
+  const el=document.createElement("div");el.id="walkBack";el.className="nudge top";el.innerHTML='<button type="button" class="nudgetxt">'+CAM+'<span>Did you go to '+esc(w.name)+'? Snap the board, it takes 10 seconds.</span></button><button type="button" class="nudgex" aria-label="Close">'+X+'</button>';
+  view.insertBefore(el,view.firstChild);
+  el.querySelector(".nudgetxt").onclick=()=>{lsSet("fiver.walked",null);el.remove();openTeach(allPlaces().find(p=>p.id===w.id)||null);};
+  el.querySelector(".nudgex").onclick=()=>{lsSet("fiver.walked",null);el.remove();};}
+// from the second visit, a small line at the bottom; closed once, never again
+function paintSnapTip(){if(VISITS<2||lsGet("fiver.snapTipOff"))return;const el=document.createElement("div");el.id="snapTip";el.className="nudge bottom";
+  el.innerHTML='<button type="button" class="nudgetxt">'+CAM+'<span>Every menu you snap helps a student eat for less.</span></button><button type="button" class="nudgex" aria-label="Close">'+X+'</button>';view.appendChild(el);
+  el.querySelector(".nudgetxt").onclick=()=>openTeach();el.querySelector(".nudgex").onclick=()=>{lsSet("fiver.snapTipOff","1");el.remove();};}
+
+/* ---------- TOUR: the rat walks to each thing, points, says one line. Next / Skip; fiver.tour; never blocks anything if it fails ---------- */
+const TOUR={on:false,i:0,steps:[],timer:null,anim:null,x:-90,y:0,full:false,snap:null,opened:false};
+function tourDone(){return lsGet("fiver.tour")==="done";}
+function tourSnap(){return {cats:new Set(state.cats),subs:(state.subs||[]).slice(),catOrder:(state.catOrder||[]).slice(),drinks:state.drinks,dsub:state.dsub,q:state.q,view:UI.view,lastCat:UI.lastCat};}
+function tourRestore(){const s=TOUR.snap;if(!s)return;Object.assign(state,{cats:s.cats,subs:s.subs,catOrder:s.catOrder,drinks:s.drinks,dsub:s.dsub,q:s.q});UI.view=s.view;UI.lastCat=s.lastCat;}
+function tourCloseSheet(){if(TOUR.opened){const h=document.getElementById("sheetHost");if(h)h.innerHTML="";TOUR.opened=false;}}
+const TOUR_SHORT=[
+  {sel:"#catChips",text:"Tap what you fancy. Pick more than one if you’re greedy."},
+  {sel:"#searchTile",text:"Know exactly what you want? Type it or say it."},
+  {sel:"#howChips",text:"Your budget, how far you’ll walk, where you are. I do the maths."},
+  {pre:()=>tourCards(),sel:"#view .hero.pick, #view .ccard",text:"Tap a place. ‘Your price’ is with your student cards, and I tell you what to show at the till."},
+  {sel:"#view .views",text:"Prefer a map? Here."},
+  {sel:"#teachBtn",text:"Snap a menu and everyone eats cheaper. Even me."}];
+// no food type ticked when the tour starts: Hot food, for the tour only (put back at the end or on Skip)
+function tourCards(){if(document.querySelector("#view .hero.pick, #view .ccard"))return;if(state.cats.size||state.q)return;state.drinks=false;state.cats=new Set(["hot"]);TOUR.changed=true;render();}
+function tourCan(){return !/jsdom/i.test(navigator.userAgent||"");}
+function tourFull(){const S0=TOUR_SHORT;const back=()=>{tourCloseSheet();tourRestore();UI.view="list";render();};
+  return [S0[0],
+    {pre:()=>{if(!document.querySelector("#subChips")){state.drinks=false;state.q="";state.cats=new Set(["coffee"]);state.catOrder=["coffee"];UI.lastCat="coffee";render();}},sel:"#subChips",text:"Narrow it down. Coffee, not tea."},
+    {pre:()=>{state.drinks=false;state.q="";state.cats=new Set(["coffee","sweet"]);state.catOrder=["coffee","sweet"];state.subs=[{cat:"coffee",id:"coffee"},{cat:"sweet",id:"doughnut"}];UI.view="list";UI.lastCat="sweet";render();},sel:"#view .ccard",text:"Pick two things, I’ll add them up."},
+    Object.assign({pre:back},S0[1]),S0[2],S0[3],
+    {sel:"#view .hero.pick a[data-walk]",text:"One tap and Google Maps walks you there."},
+    S0[4],
+    {sel:"#laterChip",text:"Planning ahead? Pick a day and a time."},
+    {sel:"#view .bubble",text:"Tap my bubble for more. I talk a lot."},
+    {sel:"#home",text:"Tap the logo to start again."},
+    {sel:"#seeAll",text:"See all: everything that fits, then what’s opening later."},
+    {sel:'#catChips .cat-tile[data-id="drinks"]',text:"Drinks are 18+. Alcohol-free option always on top."},
+    {sel:'#catChips .cat-tile[data-id="free"]',text:"Free food. My favourite price."},
+    S0[5],
+    {pre:()=>{openTeach();TOUR.opened=true;const t2=document.querySelector("#t2");if(t2)t2.hidden=false;},sel:"#tTypeBtn",text:"No photo? Type the menu instead."},
+    {sel:"#evtOpen",text:"Got a free-food invite? Paste it here."},
+    {sel:"#teachRank",text:"Every menu earns crumbs. Climb the ranks."},
+    {pre:()=>{tourCloseSheet();openMenu();TOUR.opened=true;},sel:"#m-cards > summary",text:"Cards & apps: tell me your cards, I’ll find your discounts."},
+    {sel:"#m-diet > summary",text:"Diet & allergies: I tell you what to check with staff."},
+    {sel:"#m-install > summary",text:"Install the app. I live on your home screen, rent-free."},
+    {sel:"#m-sources > summary",text:"Where prices come from. Every price says where I got it."},
+    {pre:back,sel:null}];}
+function tourEl(){let el=document.getElementById("tour");if(el)return el;el=document.createElement("div");el.id="tour";el.className="tour";
+  const fr=k=>'<span class="tf" data-f="'+k+'">'+rat(k,74)+'</span>';
+  el.innerHTML='<div class="tblock"></div><div class="tspot"></div><div class="trat">'+["walk1","walk2","walk3","walk4","point","wave"].map(fr).join("")+'</div><div class="tbub" role="dialog" aria-live="polite"><p class="ttxt"></p><div class="tbtns"><button type="button" class="arrbtn" id="tourNext"><span class="ms" data-ms="Next" style="--ms:11px"></span>'+AR+'</button><button type="button" class="linkbtn" id="tourSkip">Skip</button></div></div>';
+  document.body.appendChild(el);msRender(el);
+  el.querySelector("#tourNext").onclick=()=>{if(TOUR.i>=TOUR.steps.length){endTour();return;}tourGo(TOUR.i+1);};
+  el.querySelector("#tourSkip").onclick=()=>endTour();return el;}
+function tourFrame(k){const el=document.getElementById("tour");if(!el)return;el.querySelectorAll(".tf").forEach(f=>f.classList.toggle("on",f.dataset.f===k));}
+function startTour(full){if(TOUR.on)return;try{TOUR.on=true;TOUR.full=!!full;TOUR.changed=false;TOUR.snap=tourSnap();TOUR.steps=full?tourFull():TOUR_SHORT.slice();TOUR.x=-90;TOUR.y=Math.round(innerHeight*0.35);
+    const el=tourEl();el.classList.add("show");tourFrame("walk1");const r=el.querySelector(".trat");r.style.transition="none";r.style.left=TOUR.x+"px";r.style.top=TOUR.y+"px";tourGo(0);}catch(e){endTour();}}
+function endTour(){try{clearTimeout(TOUR.timer);clearInterval(TOUR.anim);const el=document.getElementById("tour");if(el)el.remove();lsSet("fiver.tour","done");
+    const was=TOUR.on;TOUR.on=false;if(was&&(TOUR.full||TOUR.changed)){tourCloseSheet();tourRestore();render();}TOUR.opened=false;TOUR.changed=false;}catch(e){}}
+function tourGo(i){if(!TOUR.on)return;try{clearTimeout(TOUR.timer);TOUR.i=i;const el=tourEl();el.querySelector(".tbub").classList.remove("in");
+    if(i>=TOUR.steps.length)return tourFinal();const st=TOUR.steps[i];
+    if(st.pre){try{st.pre();}catch(e){}}if(!st.sel)return tourGo(i+1);
+    TOUR.timer=setTimeout(()=>{try{const t=[...document.querySelectorAll(st.sel)].find(x=>x.getClientRects().length&&!x.closest("[hidden]"));if(!t)return tourGo(i+1); // not on this screen: next stop
+      t.scrollIntoView({block:"center"});setTimeout(()=>tourPlace(t,st.text),60);}catch(e){endTour();}},st.pre?320:0);}catch(e){endTour();}}
+const TOUR_RM=()=>!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
+function tourWalk(x,y,done){const el=document.getElementById("tour");const r=el.querySelector(".trat");clearInterval(TOUR.anim);
+  if(TOUR_RM()){r.style.transition="none";r.style.left=x+"px";r.style.top=y+"px";TOUR.x=x;TOUR.y=y;done();return;}
+  r.classList.toggle("flip",x<TOUR.x-4);let f=0;const W=["walk1","walk2","walk3","walk4"];tourFrame(W[0]);TOUR.anim=setInterval(()=>{f=(f+1)%4;tourFrame(W[f]);},125); // 8 fps
+  r.style.transition="left .6s linear, top .6s linear";requestAnimationFrame(()=>{r.style.left=x+"px";r.style.top=y+"px";});TOUR.x=x;TOUR.y=y;
+  TOUR.timer=setTimeout(()=>{clearInterval(TOUR.anim);r.classList.remove("flip");done();},620);}
+function tourBubble(text,ratX,ratY,above,last){const el=document.getElementById("tour");const b=el.querySelector(".tbub");b.querySelector(".ttxt").textContent=text;
+  const nx=b.querySelector("#tourNext .ms");nx.dataset.ms=last?"Go eat":"Next";msRender(b);
+  const bw=Math.min(330,innerWidth-32);b.style.width=bw+"px";b.style.left=Math.max(16,Math.min(innerWidth-bw-16,ratX-24))+"px";
+  const bh=b.offsetHeight||110;let top=above?ratY-bh-8:ratY+84;top=Math.max(8,Math.min(innerHeight-bh-8,top));b.style.top=top+"px";b.classList.add("in");}
+function tourPlace(t,text){if(!TOUR.on)return;const el=document.getElementById("tour");const r=t.getBoundingClientRect();const pad=6;
+  const sp=el.querySelector(".tspot");Object.assign(sp.style,{left:(r.left-pad)+"px",top:(r.top-pad)+"px",width:(r.width+pad*2)+"px",height:(r.height+pad*2)+"px",opacity:"1"});
+  const H=80;const below=r.bottom+H+150<innerHeight;const y=below?Math.round(r.bottom+8):Math.max(4,Math.round(r.top-H-6));
+  const x=Math.max(8,Math.min(innerWidth-90,Math.round(r.left+Math.min(r.width/2,60)-36)));
+  tourWalk(x,y,()=>{tourFrame("point");tourBubble(text,x,y,!below,false);});}
+function tourFinal(){const el=document.getElementById("tour");const sp=el.querySelector(".tspot");Object.assign(sp.style,{left:"50%",top:"40%",width:"0px",height:"0px"});
+  const x=Math.round(innerWidth/2-40),y=Math.round(innerHeight*0.36);tourWalk(x,y,()=>{tourFrame("wave");tourBubble("That’s it. Go eat.",x,y,false,true);});}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("#mTour");if(!b)return;const h=document.getElementById("sheetHost");if(h)h.innerHTML="";if(state.step!==S.results){state.step=S.results;render();}setTimeout(()=>startTour(true),250);});
+// the first time on the main screen, after name, uni and diet; never over a sheet (install, 18+) and never on the Drinks screen
+function maybeTour(){if(TOUR.on||tourDone()||state.step!==S.results||!state.setupDone||state.drinks||!tourCan())return;
+  setTimeout(()=>{if(TOUR.on||tourDone()||state.step!==S.results||state.drinks||document.querySelector("#sheetWrap"))return;if(document.querySelector("#view #catChips"))startTour(false);},900);}
+/* The end of Teach: the price list goes, the rat says thanks, the crumbs and the rank; Teach another or Done */
+const THANKS_X=["Legend. The next hungry student owes you one.","Menu saved. You’re officially a rat with a cause.","That board is now mine. And everyone’s."];
+function teachThanks(sheet,box,n,status){addCrumbs(n);const nm=firstName();const pose=Math.random()<0.5?"cheer":"f_excited";const extra=THANKS_X[Math.floor(Math.random()*THANKS_X.length)];
+  ["#teachHead","#trow","#t1","#t2","#evtBox"].forEach(s=>{const e=sheet.querySelector(s);if(e)e.hidden=true;});const t3=sheet.querySelector("#t3");if(t3)t3.hidden=false;
+  [sheet.querySelector("#evtOpen"),sheet.querySelector("#teachRank")].forEach(e=>{const pp=e&&e.closest("p");if(pp)pp.hidden=true;});
+  box.innerHTML='<div class="thanks" id="tThanks">'+rat(pose,128)+'<p class="lead">Thanks'+(nm?", "+esc(nm):"")+'! You just fed everyone near '+esc(areaName())+'.</p><p class="body">'+esc(extra)+'</p>'+
+    '<p class="crumbline"><b>+'+n+' crumbs · '+esc(rankName(state.crumbs||0))+'</b></p><div class="act">'+navNext("tAgain","Teach another")+'<button type="button" class="chip" id="tDone">Done</button></div><p class="note">'+esc(status)+'</p></div>';
+  msRender(box);const r=sheet.querySelector("#teachRank");if(r)r.textContent=(state.crumbs||0)+" crumbs · "+rankName(state.crumbs||0);
+  box.querySelector("#tAgain").onclick=()=>openTeach();box.querySelector("#tDone").onclick=()=>{document.getElementById("sheetHost").innerHTML="";};}
 let savedT=null;
 function saved(){ // a short "Saved." under the settings panel, every time something changes there
   let el=document.getElementById("savedToast");if(!el){el=document.createElement("div");el.id="savedToast";el.className="savedToast";el.setAttribute("role","status");el.textContent="Saved.";document.body.appendChild(el);}
@@ -2440,6 +2718,7 @@ function openMenu(section){
   host.innerHTML='<div class="sheetWrap" id="sheetWrap"><div class="sheet menu" role="dialog" aria-modal="true" aria-label="Menu"><button class="close" id="closeSheet">Close</button>'+
     '<div class="mhead">'+rat("f_neutral",64)+'<div><span class="ms" data-ms="'+esc(nm||"Your rat")+'" style="--ms:18px"></span><p class="meta"><b>'+(state.crumbs||0)+' crumbs · '+esc(rankName(state.crumbs||0))+'</b></p><p class="meta">Your name and cards stay on this phone. Menus you teach me are shared.</p></div></div>'+
     '<p class="note saveHint">Changes save as you go.</p>'+
+    '<p class="note"><button type="button" class="linkbtn" id="mTour">Fiver’s full tour →</button></p>'+
     '<div class="k mgrp">You</div>'+
     sec("name","Your name",'<input class="line" id="mName" placeholder="Your first name" maxlength="24" value="'+esc(state.name)+'">')+
     sec("cards","Cards &amp; apps",cardsBody)+
@@ -2835,7 +3114,7 @@ function wireMenu(d,place){
         why:""});
       teachBump();persist();render();
       const everyone=await saveShared({kind:"menu",place_name:finalName,address,lat,lon,items:offers.map(x=>({item:x.item,price:x.price,cat:x.cat,diet:x.tags})),added_by:firstName()||"a student",place_id:T.shop.placeId||null,coord_source:coordSource});
-      T.sent=true;setStep(3);btn.hidden=true;saved.textContent=(everyone?"Everyone nearby sees it. ":"Saved on this phone"+(shared.lastErr?" ("+shared.lastErr+")":"")+". ")+keep.length+" item"+(keep.length>1?"s":"")+" at "+finalName+".";teachCelebrate(d,pts,"Cheers. That’s on the map now.");if(d.scrollTo)d.scrollTo({top:0,behavior:"smooth"});};};
+      T.sent=true;setStep(3);teachThanks(d,sb,pts,(everyone?"Everyone nearby sees it. ":"Saved on this phone"+(shared.lastErr?" ("+shared.lastErr+")":"")+". ")+keep.length+" item"+(keep.length>1?"s":"")+" at "+finalName+".");if(d.scrollTo)d.scrollTo({top:0,behavior:"smooth"});};};
   const cleanItems=j=>{const all=((j&&j.items)||[]).filter(x=>x&&typeof x.price==="number"&&x.item);const items=all.filter(x=>x.price>=0.2&&x.price<=15).slice(0,40);return {items,odd:all.length-items.length};};
   // the compact photo answer {"m","p","i":[[name,price,cat]]} → {isMenu,place,items:[{item,price,cat,tags}]}; the old long form still works
   const CATS1={h:"hot",s:"snack",c:"coffee",w:"sweet",d:"deal"};
