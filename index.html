@@ -1504,6 +1504,18 @@ const shared={rows:[],places:[],at:0,ok:null,loading:false};
 function fetchT(url,opts,ms){const ctl=typeof AbortController==="function"?new AbortController():null;const timer=ctl?setTimeout(()=>ctl.abort(),ms):null;
   return fetch(url,Object.assign({},opts,{signal:ctl?ctl.signal:undefined})).finally(()=>{if(timer)clearTimeout(timer);});}
 const SB_HEADERS={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"};
+/* Anonymous counts in public.events: only the moment (open, results, walk, teach) and this phone's random id (DEVICE_ID).
+   Never a name, a place, a card or the search words. Fire and forget: no waiting, no retries, errors ignored.
+   ?me=1 once marks this phone as Olivia's: it never sends anything again. */
+const TRACK_TYPES=["open","results","walk","teach"];
+const TRACK_OFF=(()=>{try{if(/[?&]me=1(&|$)/.test(location.search))localStorage.setItem("fiver.me","1");return localStorage.getItem("fiver.me")==="1";}catch(e){return true;}})();
+function track(type){if(TRACK_OFF||!ON_SITE||!TRACK_TYPES.includes(type))return;
+  try{fetch(SB_URL+"/rest/v1/events",{method:"POST",keepalive:true,headers:Object.assign({Prefer:"return=minimal"},SB_HEADERS),body:JSON.stringify({type,device_id:DEVICE_ID})}).catch(()=>{});}catch(e){}}
+/* "open": once per session (a new tab or a reopened app is a new session) */
+(()=>{let first=true;try{first=sessionStorage.getItem("fiver.opened")!=="1";sessionStorage.setItem("fiver.opened","1");}catch(e){}if(first)setTimeout(()=>track("open"),0);})();
+/* "results": once each time a new set of results settles on screen (1.5 s), not on every redraw */
+let _trackRes={key:null,timer:null};
+function trackResults(key){if(TRACK_OFF||!ON_SITE||key===_trackRes.key)return;clearTimeout(_trackRes.timer);_trackRes.timer=setTimeout(()=>{if(_trackRes.key===key)return;_trackRes.key=key;track("results");},1500);}
 /* A contribution row → a place the ranker understands. Older than 30 days: "checked N days ago" and a lower rank. */
 function sharedPlace(r){
   const age=Math.max(0,Math.floor((Date.now()-new Date(r.created_at).getTime())/86400000));
@@ -1531,7 +1543,7 @@ async function loadShared(force){
 }
 /* Save a contribution. Returns true when everyone near UCL can see it; false means it stayed on this phone. Never the photo. */
 async function saveShared(row){
-  shared.lastErr="";if(!ON_SITE)return false;
+  shared.lastErr="";if(!ON_SITE)return false;track("teach");
   try{const res=await fetchT(SB_URL+"/rest/v1/contributions",{method:"POST",headers:Object.assign({Prefer:"return=minimal"},SB_HEADERS),body:JSON.stringify(Object.assign({device_id:DEVICE_ID,status:"live"},row))},5000);
     if(!res.ok)shared.lastErr="Supabase "+res.status;return res.ok;}
   catch(e){shared.lastErr=e&&e.name==="AbortError"?"Supabase timeout":"no connection";return false;}
@@ -2225,7 +2237,7 @@ function dots(){
   ratPos=cur;
 }
 function go(n){state.step=n;render();window.scrollTo({top:0,behavior:"smooth"});}
-function render(){if(SAY.rec&&state.step!==S.results)stopSay();dots();const f=[vHello,vWhere,vResults][state.step];view.innerHTML="";view.appendChild(f());if(state.step===S.results){paintWalkBack();paintSnapTip();maybeTour();}msRender(view);paintInstall();stageEnter();if(state.step===S.results)loadShared();if(DBG_ON)paintDebug();}
+function render(){if(SAY.rec&&state.step!==S.results)stopSay();dots();const f=[vHello,vWhere,vResults][state.step];view.innerHTML="";view.appendChild(f());if(state.step===S.results){paintWalkBack();paintSnapTip();maybeTour();}msRender(view);paintInstall();stageEnter();if(state.step===S.results){loadShared();trackResults(filterKey()+"|"+(state.drinks?"d":""));}if(DBG_ON)paintDebug();}
 /* ?debug=1 only: what the search understood. Nothing changes without it. */
 function paintDebug(){let el=document.getElementById("dbg");if(!el){el=document.createElement("div");el.id="dbg";el.setAttribute("style","position:fixed;left:6px;bottom:6px;z-index:9999;max-width:70vw;background:rgba(0,0,0,.78);color:#fff;font:11px/1.35 ui-monospace,monospace;padding:6px 8px;border-radius:6px;pointer-events:none");document.body.appendChild(el);}
   if(state.q&&state.step===S.results)rank();
@@ -2922,7 +2934,7 @@ function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}}
 const VISITS=(()=>{const n=Number(lsGet("fiver.visits")||0)+1;lsSet("fiver.visits",String(n));return n;})();
 // "Walk there" tapped: back in the app within 2 hours, one line at the top asks for the board
-document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a[data-walk]");if(!a)return;const p=allPlaces().find(x=>x.id===a.dataset.walk);lsSet("fiver.walked",JSON.stringify({id:a.dataset.walk,name:p?p.name:"",t:Date.now()}));UI.walkBack=false;},true);
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a[data-walk]");if(!a)return;const p=allPlaces().find(x=>x.id===a.dataset.walk);lsSet("fiver.walked",JSON.stringify({id:a.dataset.walk,name:p?p.name:"",t:Date.now()}));UI.walkBack=false;track("walk");},true);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&lsGet("fiver.walked")){UI.walkBack=true;if(state.step===S.results)paintWalkBack();}});
 UI.walkBack=!!lsGet("fiver.walked");
 if(state.seenResults||state.cats.size)lsSet("fiver.tapped","1"); // not a first launch
