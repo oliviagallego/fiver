@@ -101,6 +101,19 @@ Fed for a Fiver dice a los estudiantes dónde comer en Londres por menos de £5:
 **Enseñar a Fiver (fotos de cartas)**
 - Límite de 10 fotos al día. Tiene que ser una carta. Hay que estar a menos de 150 m de la tienda. Precios entre £0,20 y £15.
 
+## Viabilidad legal (siempre)
+
+Cada idea, encargo o cambio lleva una revisión legal antes de construirlo, en la misma respuesta que la viabilidad técnica: **viable / viable con condiciones / no viable**, con la norma, la condición y lo que no está comprobado. Claude no es abogado: lo dudoso se marca "para revisión legal", no se da por bueno.
+
+Qué mirar siempre (Reino Unido):
+- **Datos personales:** UK GDPR y Data Protection Act 2018. Base legal, minimización, plazos, derechos (borrar), encargados (Supabase, Anthropic, Google) y el texto de Privacy.
+- **Guardar o leer en el móvil y avisos:** PECR (`localStorage`, ID del móvil, analítica, notificaciones push). ¿Hace falta consentimiento o entra en una excepción?
+- **Menores:** Age Appropriate Design Code del ICO (puede haber estudiantes de 17 años).
+- **Contenido que suben los usuarios:** Online Safety Act 2023 (menús que ven otros).
+- **Precios y publicidad:** DMCC Act 2024 (prácticas engañosas) y CAP Code (alcohol: nunca dirigido a menores de 18).
+- **Alérgenos:** nunca "safe". La app no sustituye la información del local.
+- **Terceros:** condiciones de Google Maps Platform (qué se guarda y cuánto tiempo), ODbL de OpenStreetMap (atribución), condiciones y política de uso de Anthropic, marcas y logos de las cadenas (nombres sí, logos no), derechos sobre fotos y cartas.
+
 ## Diseño (fijado por Olivia)
 
 - Colores: crema `#FFF7EB`, burdeos `#59211F`, negro `#111111`. El damero burdeos/crema, una sola vez.
