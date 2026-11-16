@@ -21,6 +21,7 @@ Fed for a Fiver dice a los estudiantes dónde comer en Londres por menos de £5:
 
 ## Publicar
 
+- **Antes de cualquier acción en GitHub, avisa a Olivia y espera su "ok".** Push, abrir o cambiar un pull request, comentar, crear o borrar ramas, conectar el repo con permiso de escritura: di qué vas a hacer y en qué rama, y para. Un "ok" vale solo para lo que pediste, no para lo siguiente. Leer o clonar no hace falta pedirlo.
 - **`main` es producción.** GitHub Pages publica sola en fedforafiver.com.
 - **Nunca hagas push a `main`.** Trabaja en una rama, abre un pull request y para. Olivia revisa y fusiona.
 - **El repo es público.** No escribas en archivos, commits ni pull requests: claves, datos personales de nadie, ni planes de negocio.
